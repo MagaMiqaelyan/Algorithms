@@ -121,19 +121,21 @@ namespace Leetcode
             #endregion
         }
 
-        public static int NumRollsToTarget(int n, int k, int target)
-        {
-            var mod = (int)Math.Pow(10, 9) + 7;
-            var res = new int[n + 1, target + 1];
-            for (int i = 0; i < n+1; i++)
-            {
-                for (int j = 0; j < target+1; j++)
-                {
-                    res[i, j] = -1;
-                }
-            }
-            return Rolls(n, k, target, res, mod);
-        }
+        //public static int NumRollsToTarget(int n, int k, int target)
+        //{
+        //    int test;
+
+        //    var mod = (int)Math.Pow(10, 9) + 7;
+        //    var res = new int[n + 1, target + 1];
+        //    for (int i = 0; i < n+1; i++)
+        //    {
+        //        for (int j = 0; j < target+1; j++)
+        //        {
+        //            res[i, j] = -1;
+        //        }
+        //    }
+        //    return Rolls(n, k, target, res, mod);
+        //}
         public static int Rolls(int n, int k, int target, int[,] result, int mod)
         {
             if (n == 0 && target == 0) return 1;
