@@ -48,44 +48,74 @@ namespace AlgoExpert
 
         public static int[] SmallestDifference(int[] arrayOne, int[] arrayTwo)
         {
-            var result = new int[2];
             var minDistance = int.MaxValue;
+            var result = new int[2];
             Array.Sort(arrayOne);
             Array.Sort(arrayTwo);
-            for (int i = 0; i < arrayOne.Length; i++)
+            var i = 0;
+            var j = 0;
+            while (i < arrayOne.Length && j < arrayTwo.Length)
             {
-                var j = 0;
                 var min = Math.Max(arrayOne[i], arrayTwo[j]) - Math.Min(arrayOne[i], arrayTwo[j]);
-                while (j < arrayTwo.Length && arrayOne[i] > arrayTwo[j])
-                {
-                    j++;
-                }
-                if (j == arrayTwo.Length) j--;
-                var twoNum = arrayTwo[j];
-                if (j > 0)
-                {
-                    var previous = Math.Max(arrayTwo[j - 1], arrayOne[i]) - Math.Min(arrayTwo[j - 1], arrayOne[i]);
-                    var next = Math.Max(arrayTwo[j], arrayOne[i]) - Math.Min(arrayTwo[j], arrayOne[i]);
-                    if (previous < next)
-                    {
-                        min = previous;
-                        twoNum = arrayTwo[j - 1];
-                    }
-                    else
-                    {
-                        min = next;
-                        twoNum = arrayTwo[j];
-                    }
-
-                }
-                if (minDistance > min)
+                if (min < minDistance)
                 {
                     minDistance = min;
                     result[0] = arrayOne[i];
-                    result[1] = twoNum;
+                    result[1] = arrayTwo[j];
                 }
+
+                if (arrayOne[i] < arrayTwo[j])
+                {
+                    i++;
+                }
+                else if (arrayOne[i] > arrayTwo[j])
+                {
+                    j++;
+                }
+                else
+                    return result;
+
             }
             return result;
+            // bad solution
+            //var result = new int[2];
+            //var minDistance = int.MaxValue;
+            //Array.Sort(arrayOne);
+            //Array.Sort(arrayTwo);
+            //for (int i = 0; i < arrayOne.Length; i++)
+            //{
+            //    var j = 0;
+            //    var min = Math.Max(arrayOne[i], arrayTwo[j]) - Math.Min(arrayOne[i], arrayTwo[j]);
+            //    while (j < arrayTwo.Length && arrayOne[i] > arrayTwo[j])
+            //    {
+            //        j++;
+            //    }
+            //    if (j == arrayTwo.Length) j--;
+            //    var twoNum = arrayTwo[j];
+            //    if (j > 0)
+            //    {
+            //        var previous = Math.Max(arrayTwo[j - 1], arrayOne[i]) - Math.Min(arrayTwo[j - 1], arrayOne[i]);
+            //        var next = Math.Max(arrayTwo[j], arrayOne[i]) - Math.Min(arrayTwo[j], arrayOne[i]);
+            //        if (previous < next)
+            //        {
+            //            min = previous;
+            //            twoNum = arrayTwo[j - 1];
+            //        }
+            //        else
+            //        {
+            //            min = next;
+            //            twoNum = arrayTwo[j];
+            //        }
+
+            //    }
+            //    if (minDistance > min)
+            //    {
+            //        minDistance = min;
+            //        result[0] = arrayOne[i];
+            //        result[1] = twoNum;
+            //    }
+            //}
+            //return result;
         }
 
         public static int[] ArrayOfProducts(int[] array)
