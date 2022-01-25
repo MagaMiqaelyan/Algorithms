@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 namespace Leetcode
@@ -116,18 +117,215 @@ namespace Leetcode
             //    Console.WriteLine(string.Join(" ", m[i]));
             //}
             // Console.WriteLine(CountCharacters(new string[] { "hello", "world", "leetcode" }, "welldonehoneyr"));
+            //Console.WriteLine(NumRollsToTarget(30, 30, 500));
+            //Console.WriteLine(RotateString("abcde", "abced"));
 
-            Console.WriteLine(NumRollsToTarget(30, 30, 500));
+            //Console.WriteLine(string.Join(" ", MajorityElement(new int[] { 2, 1, 1, 3, 1, 4, 5, 6})));
+
+            //var treeNode = new TreeNode(5, new TreeNode(3, new TreeNode(2), new TreeNode(4)),
+            //    new TreeNode(6, null, new TreeNode(6, null, new TreeNode(7))));
+            //var r = TrimBST(treeNode, 1, 3);
+
+            //var n1 = new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9))));
+            //var n2 = new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9))));
+            //var r = AddTwoNumbers2(n1, n2);
+
+            ///[5,3,6,2,4,null,null,1]
+            //var treeNode = new TreeNode(5, new TreeNode(3, new TreeNode(2, new TreeNode(1)),
+            //    new TreeNode(4)), new TreeNode(6, new TreeNode(7), new TreeNode(9)));
+            //KthSmallest(treeNode, 3);
+            //GenerateTrees(3);
+
             #endregion
+
+        }
+      
+
+        public static IList<TreeNode> GenerateTrees(int n)
+        {
+            var result = GenerateBST(1, n);
+            return result;
+        }
+
+        public static IList<TreeNode> GenerateBST(int s, int e)
+        {
+            var list = new List<TreeNode>();
+            if (s > e) list.Add(null);
+            if (s == e) list.Add(new TreeNode(s));
+            else
+            {
+                for (int i = s; i <= e; i++)
+                {
+                    var lefts = GenerateBST(s, i - 1);
+                    var rights = GenerateBST(i + 1, e);
+                    foreach (var l in lefts)
+                        foreach (var r in rights)
+                            list.Add(new TreeNode(i, l, r));
+                }
+            }
+            return list;
+        }
+
+        public TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q)
+        {
+            if (root == null) return null;
+            if (root == p || root == q)
+                return root;
+            var left = LowestCommonAncestor(root.left, p, q);
+            var right = LowestCommonAncestor(root.right, p, q);
+            if (left != null && right != null) return root;
+            if (left != null) return left;
+            if (right != null) return right;
+            return null;
+        }
+
+        public static void BFSTree(TreeNode root)
+        {
+            var q = new Queue<TreeNode>();
+            var l = new List<List<TreeNode>>() { new List<TreeNode> { root } };
+            q.Enqueue(root);
+            var c = new List<TreeNode>();
+            while (q.Count > 0)
+            {
+
+                if (q.Count == c.Count)
+                {
+                    l.Add(c);
+                    c = new List<TreeNode>();
+                }
+
+                var curr = q.Dequeue();
+                if (curr.left != null)
+                {
+                    q.Enqueue(curr.left);
+                    c.Add(curr.left);
+                }
+                if (curr.right != null)
+                {
+                    q.Enqueue(curr.right);
+                    c.Add(curr.right);
+                }
+
+            }
+        }
+
+        public static int KthSmallest(TreeNode root, int k)
+        {
+            k0 = k;
+            var d = Helper(root);
+            return d;
+        }
+
+        private static int k0;
+        public static int Helper(TreeNode node)
+        {
+            if (node == null) return -1;
+            var leftVal = Helper(node.left);
+            if (leftVal != -1) return leftVal;
+            if (k0 == 1) return node.val;
+            k0--;
+            return Helper(node.right);
+        }
+
+        public static ListNode AddTwoNumbers2(ListNode l1, ListNode l2)
+        {
+            BigInteger num1 = l1.val;
+            BigInteger num2 = l2.val;
+            var result = new ListNode();
+            var cur = result;
+
+            while (l1?.next != null || l2?.next != null)
+            {
+                if (l1?.next != null)
+                {
+                    num1 *= 10;
+                    num1 += l1.next.val;
+                    l1 = l1?.next;
+                }
+                if (l2?.next != null)
+                {
+                    num2 *= 10;
+                    num2 += l2.next.val;
+                    l2 = l2?.next;
+                }
+            }
+
+            var sum = num1 + num2;
+            var s = sum.ToString().Length;
+            BigInteger cnt = BigInteger.Pow(10, (s - 1));// Math.Pow(10, (s - 1));
+            while (cnt > 0)
+            {
+                var r = sum / cnt;
+                sum %= cnt;
+                cnt /= 10;
+                cur.val = (int)r;
+                if (cnt > 0)
+                {
+                    cur.next = new ListNode();
+                    cur = cur.next;
+                }
+            }
+            return result;
+        }
+
+        private static TreeNode TrimBST(TreeNode root, int low, int high)
+        {
+            if (root == null) return null;
+
+            root.left = TrimBST(root.left, low, high);
+            root.right = TrimBST(root.right, low, high);
+
+            if (root.val < low)
+                return root.right;
+
+            if (root.val > high)
+                return root.left;
+
+            return root;
+        }
+
+        public static IList<int> MajorityElement(int[] nums)
+        {
+            if (nums.Length == 1) return nums;
+            if (nums.Length == 2 && nums[1] == nums[0]) return new List<int> { nums[0] };
+            if (nums.Length == 2) return nums;
+            var res = new List<int>();
+            var n = nums.Length;
+            var times = Math.Round(n / 3d, MidpointRounding.ToZero);
+            var dict = new Dictionary<int, int>();
+
+            for (int i = 0; i < n; i++)
+            {
+                if (dict.ContainsKey(nums[i]))
+                    dict[nums[i]]++;
+                else dict.Add(nums[i], 1);
+
+                if (dict[nums[i]] > times && (!res.Contains(nums[i])))
+                    res.Add(nums[i]);
+            }
+            return res;
+        }
+
+        //s = "abcde", goal = "cdeab"
+        public static bool RotateString(string s, string goal)
+        {
+            if (s.Length != goal.Length) return false;
+            for (int i = 0; i < s.Length; i++)
+            {
+                var temp = s.Substring(i, s.Length - i) + s.Substring(0, i);
+                if (temp == goal)
+                    return true;
+            }
+            return false;
         }
 
         public static int NumRollsToTarget(int n, int k, int target)
         {
             var mod = (int)Math.Pow(10, 9) + 7;
             var res = new int[n + 1, target + 1];
-            for (int i = 0; i < n+1; i++)
+            for (int i = 0; i < n + 1; i++)
             {
-                for (int j = 0; j < target+1; j++)
+                for (int j = 0; j < target + 1; j++)
                 {
                     res[i, j] = -1;
                 }
@@ -143,7 +341,7 @@ namespace Leetcode
             long res = 0;
 
             for (int i = 1; i <= k; i++)
-                res = res % mod  + Rolls(n - 1, k, target - i, result, mod) % mod;
+                res = res % mod + Rolls(n - 1, k, target - i, result, mod) % mod;
 
             result[n, target] = (int)res % mod;
             return result[n, target];
