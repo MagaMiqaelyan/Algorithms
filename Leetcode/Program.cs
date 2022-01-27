@@ -138,9 +138,73 @@ namespace Leetcode
 
             #endregion
 
+            //points = [[1, 3],[3,3],[5,3],[2,2]], queries = [[2, 3, 1],[4,3,1],[1,1,2]]
+            //CountPoints(new int[][] { new int[] {1,3}, new int[] {3,3}, new int[] {5,3}, new int[] {2,2}},
+            //    new int[][] { new int[] { 2, 3, 1 }, new int[] { 4, 3, 1 }, new int[] { 1, 1, 2 } });
+            //MinOperations("001011");
+            MaxWidthOfVerticalArea(new int[][] { new int[] { 3, 1 }, new int[] { 9, 0 }, new int[] { 1,0 }, 
+                new int[] { 1, 4 }, new int[] {5, 3 }, new int[] { 8, 8 } });
         }
-      
 
+        public static int MaxWidthOfVerticalArea(int[][] points)
+        {
+            var horizontal = points.Select(x => x.FirstOrDefault()).OrderBy(x => x).ToArray();
+            var res = 0;
+            for (int i = 1; i < horizontal.Count(); i++)
+            {
+                res = Math.Max(res, horizontal[i] - horizontal[i - 1]);
+            }
+            return res;
+        }
+
+        public static int[] MinOperations(string boxes)
+        {
+            var result = new int[boxes.Length];
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                var left = i - 1;
+                var right = i + 1;
+                while (left >= 0)
+                {
+                    if (boxes[left] == '1')
+                    {
+                        result[i] += Math.Abs(i - left);
+                    }
+                    left--;
+                }
+                while (right < boxes.Length)
+                {
+                    if (boxes[right] == '1')
+                    {
+                        result[i] += Math.Abs(i - right);
+                    }
+                    right++;
+                }
+            }
+            return result;
+        }
+
+        public static int[] CountPoints(int[][] points, int[][] queries)
+        {
+            var result = new int[queries.Length];
+            var q = 0;
+            for (int i = 0; i < queries.Length; i++)
+            {
+                var x = queries[i][0];
+                var y = queries[i][1];
+                var r = queries[i][2];
+                for (int j = 0; j < points.Length; j++)
+                {
+                    var x0 = points[j][0];
+                    var y0 = points[j][1];
+                    var eq = Math.Pow(x - x0, 2) + Math.Pow(y - y0, 2);
+                    if (eq <= Math.Pow(r, 2))
+                        result[q]++;
+                }
+                q++;
+            }
+            return result;
+        }
         public static IList<TreeNode> GenerateTrees(int n)
         {
             var result = GenerateBST(1, n);
