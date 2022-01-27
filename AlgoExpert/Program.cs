@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +17,103 @@ namespace AlgoExpert
             //groupAnagrams(new List<string> { "yo", "act", "flop", "tac", "foo", "cat", "oy", "olfp" });
             //ValidIPAddresses("1921680");
             //Console.WriteLine(ReverseWordsInString("tim    4"));
-            MinimumCharactersForWords(new string[] { "this", "that", "did", "deed", "them!", "a"});
+            // MinimumCharactersForWords(new string[] { "this", "that", "did", "deed", "them!", "a"});
+            //var xy = PatternMatcher("xxx", "sassassas");
+            LongestBalancedSubstring("())()(()())");
+        }
+
+        //(()))(
+        public static int LongestBalancedSubstring(string str)
+        {
+            var maxCount = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                for (int j = i + 1; j < str.Length; j++)
+                {
+                    var temp = str.Substring(i, j - i + 1);
+                    if (temp.Length % 2 != 0) continue;
+                    if (IsBalanced(temp))
+                    {
+                        maxCount = Math.Max(maxCount, temp.Length);
+                    }
+                }
+            }
+            return maxCount;
+        }
+
+        public static bool IsBalanced(string str)
+        {
+            var stack = new Stack<char>();
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == '(')
+                {
+                    stack.Push(str[i]);
+                }
+                else
+                {
+                    if (stack.Count == 0) return false; // ))
+                    if (stack.Peek() == '(')
+                    {
+                        stack.Pop();
+                    }
+                }
+            }
+            return stack.Count == 0;
+        }
+
+        //xxyxxy //gogopowerrangegogopowerrange = 30
+        // xxx   sassassas
+        public static string[] PatternMatcher(string pattern, string str)
+        {
+            var xCount = PatternCount(pattern, 'x'); // 4
+            var yCount = PatternCount(pattern, 'y'); // 2
+            if (xCount == 0 || yCount == 0)
+                return new string[] { "", str.Substring(0, str.Length / pattern.Length) };
+            var xStartIndx = pattern.IndexOf('x'); // 0
+            var yStartIndx = pattern.IndexOf('y');// 2
+            for (int i = 1; i < str.Length; i++)
+            {
+                var xLength = i; // 1
+                if (xCount * xLength > str.Length) return new string[] { };
+                var r = (str.Length - xCount * xLength) % yCount; // 0
+                if (r != 0) continue;
+                var yLength = (str.Length - xCount * xLength) / yCount; // 13
+                string x = "", y = "";
+                if (xStartIndx == 0)
+                {
+                    x = str.Substring(0, xLength);
+                    y = str.Substring(yStartIndx * xLength, yLength);
+                }
+                else
+                {
+                    y = str.Substring(0, yLength);
+                    x = str.Substring(xStartIndx * yLength, xLength);
+                }
+
+                var result = new StringBuilder();
+                for (int j = 0; j < pattern.Length; j++)
+                {
+                    if (pattern[j] == 'x')
+                    {
+                        result.Append(x);
+                    }
+                    else
+                    {
+                        result.Append(y);
+                    }
+                }
+                if (result.ToString() == str)
+                    return new string[] { x, y };
+            }
+
+            return new string[] { };
+        }
+
+        public static int PatternCount(string pattern, char current)
+        {
+            return pattern.Where(p => p == current).Count();
         }
 
         public static string[] MinimumCharactersForWords(string[] words)
@@ -54,7 +149,7 @@ namespace AlgoExpert
                     {
                         dict.Add(t.Key, new List<char>());
                         var cnt = t.Value;
-                        while(cnt > 0)
+                        while (cnt > 0)
                         {
                             dict[t.Key].Add(t.Key);
                             cnt--;
@@ -124,7 +219,6 @@ namespace AlgoExpert
             if (ipInt > 255) return false;
             return ip.Length == ipInt.ToString().Length;
         }
-
 
         // "yo", "act", "flop", "tac", "foo", "cat", "oy", "olfp" 
         public static List<List<string>> groupAnagrams(List<string> words)

@@ -38,6 +38,43 @@ namespace Leetcode
             children = _children;
         }
     }
+    public class CombinationIterator
+    {
+        string _characters;
+        int _combinationLenght;
+        Queue<string> stack = new Queue<string>();
+
+        public CombinationIterator(string characters, int combinationLength)
+        {
+            _characters = characters;
+            _combinationLenght = combinationLength;
+            if (characters.Length >= combinationLength)
+            {
+                for (int i = 0; i < characters.Length; i++)
+                {
+
+                }
+            }
+
+        }
+
+        public string Next()
+        {
+            if (stack.Count != 0)
+            {
+                return stack.Dequeue();
+            }
+            return "";
+        }
+
+        public bool HasNext()
+        {
+            if (stack.Count == 0) return false;
+            return true;
+        }
+    }
+
+
     class Program
     {
         static void Main(string[] args)
@@ -142,8 +179,39 @@ namespace Leetcode
             //CountPoints(new int[][] { new int[] {1,3}, new int[] {3,3}, new int[] {5,3}, new int[] {2,2}},
             //    new int[][] { new int[] { 2, 3, 1 }, new int[] { 4, 3, 1 }, new int[] { 1, 1, 2 } });
             //MinOperations("001011");
-            MaxWidthOfVerticalArea(new int[][] { new int[] { 3, 1 }, new int[] { 9, 0 }, new int[] { 1,0 }, 
-                new int[] { 1, 4 }, new int[] {5, 3 }, new int[] { 8, 8 } });
+            //MaxWidthOfVerticalArea(new int[][] { new int[] { 3, 1 }, new int[] { 9, 0 }, new int[] { 1,0 },
+            //    new int[] { 1, 4 }, new int[] {5, 3 }, new int[] { 8, 8 } });
+           // CombinationIterator("gkosu", 3);
+        }
+
+        private static string _characters;
+        private static int _combinationLenght;
+        private static Queue<string> queue = new Queue<string>();
+
+        //abc 2 -> ab ac bc
+        //gkosu 3 -> gko gks gku gos gou gsu kos kou ksu osu
+        public static void CombinationIterator(string characters, int combinationLength)
+        {
+            _characters = characters;
+            _combinationLenght = combinationLength;
+            GetCombination(0, new List<char>());
+
+        }
+
+        public static void GetCombination(int index, List<char> result)
+        {
+            if (_combinationLenght == result.Count)
+            {
+                queue.Enqueue(new string(result.ToArray()));
+                return;
+            }
+
+            for (int i = index; i < _characters.Length; i++)
+            {
+                result.Add(_characters[i]);
+                GetCombination(i + 1, result);
+                result.RemoveAt(result.Count - 1);
+            }
         }
 
         public static int MaxWidthOfVerticalArea(int[][] points)
