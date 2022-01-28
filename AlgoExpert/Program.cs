@@ -19,9 +19,207 @@ namespace AlgoExpert
             //Console.WriteLine(ReverseWordsInString("tim    4"));
             // MinimumCharactersForWords(new string[] { "this", "that", "did", "deed", "them!", "a"});
             //var xy = PatternMatcher("xxx", "sassassas");
-            LongestBalancedSubstring("())()(()())");
+            // LongestBalancedSubstring("())()(()())");
+            // KMP("this is a man", "mamanghmanan");
+            // CaesarCypherEncryptor("abc", 52);
+            //GenerateDocument("     ", "     ");
+            //UnderscorifySubstring("testthis is a testtest to see if testestest it works", "test");
+            // LongestSubstringWithoutDuplication("abc");
+            //var c = SmallestSubstringContaining("abcd$ef$axb$c$", "$$abf");
         }
 
+        public static string SmallestSubstringContaining(string bigstring, string smallstring)
+        {
+            var dict = new Dictionary<char, int>();
+            for (int i = 0; i < smallstring.Length; i++)
+            {
+                if (dict.ContainsKey(smallstring[i]))
+                    dict[smallstring[i]]++;
+                else dict.Add(smallstring[i], 1);
+            }
+
+            var cnt = dict.Count;
+            var left = 0;
+            var right = 0;
+            var mins = new int[] { 0, int.MaxValue };
+            for (int i = 0; i < bigstring.Length; i++)
+            {
+                if (dict.ContainsKey(bigstring[right]))
+                {
+                    dict[bigstring[right]]--;
+                    if (dict[bigstring[right]] == 0)
+                        cnt--;
+                }
+                if (cnt == 0)
+                {
+                    if (right - left < mins[1] - mins[0])
+                    {
+                        mins[1] = right;
+                        mins[0] = left;
+                        cnt = dict.Count;
+                    }
+
+                }
+                right++;
+            }
+            return bigstring.Substring(mins[0], mins[1] - mins[0]);
+        }
+
+        //clementisacap
+        public static string LongestSubstringWithoutDuplication(string str)
+        {
+            var startIndex = 0;
+            var left = 0;
+            var right = 1;
+            var dict = new Dictionary<char, int>();
+            for (int i = 0; i < str.Length; i++)
+            {
+                var c = str[i];
+                if (dict.ContainsKey(c))
+                {
+                    startIndex = Math.Max(startIndex, dict[c] + 1);
+                    dict[c] = i;
+                }
+                else
+                {
+                    dict.Add(c, i);
+                }
+
+                if (right - left < i + 1 - startIndex)
+                {
+                    right = i + 1;
+                    left = startIndex;
+                }
+            }
+            return str.Substring(left, right - left);
+        }
+
+        public static string UnderscorifySubstring(string str, string substring)
+        {
+            var list = KMP(str, substring);
+            var result = new StringBuilder();
+            var k = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                //if (k < list.Count && i == list[k])
+                //{
+                //    result.Append('_');
+
+                //    var left = list[k];
+                //    var right = 0;
+                //    while (i < str.Length && k + 1 < list.Count
+                //        && list[k + 1] - list[k] <= substring.Length)
+                //    {
+                //        k++;
+                //    }
+
+                //    if (left == list[k])
+                //    {
+                //        result.Append(substring);
+                //        i += substring.Length - 1;
+                //        k++;
+                //    }
+                //    else
+                //    {
+                //        right = list[k] + substring.Length;
+                //        result.Append(str.Substring(left, right - left));
+                //        i = right - 1;
+                //        k++;
+
+                //    }
+                //    result.Append('_');
+                //}
+                //else
+                //{
+                //    result.Append(str[i]);
+                //}
+            }
+
+            return result.ToString();
+        }
+
+        public static bool GenerateDocument(string characters, string document)
+        {
+            var arr = new int[256];
+            for (int i = 0; i < characters.Length; i++)
+                arr[(int)characters[i]]++;
+            for (int i = 0; i < document.Length; i++)
+                arr[(int)document[i]]--;
+
+            for (int i = 0; i < 256; i++)
+            {
+                if (arr[i] < 0)
+                    return false;
+            }
+            return true;
+        }
+
+        public static List<bool> MultistringSearch(string bigstring, string[] smallstrings)
+        {
+            //var res = new List<bool>();
+            //for (int i = 0; i < smallstrings.Length; i++)
+            //{
+            //    if (KMP(bigstring, smallstrings[i]) != -1)
+            //        res.Add(true);
+            //    else
+            //        res.Add(false);
+            //}
+            //return res;
+            return null;
+        }
+
+        // this is a man,   mamanghmanan
+        //                  001200012345 
+        public static List<int> KMP(string s, string pattern)
+        {
+            // get pattern's array
+            var patterns = new int[pattern.Length];
+            for (int i = 1; i < pattern.Length; i++)
+            {
+                var j = 0;
+                if (pattern[j] == pattern[i])
+                {
+                    patterns[i]++;
+                    while (i + 1 < pattern.Length && pattern[++j] == pattern[++i])
+                    {
+                        patterns[i] = patterns[i - 1] + 1;
+                    }
+                }
+            }
+
+            // get substring in given string
+            int m = 0;
+            int n = 0;
+            var list = new List<int>();
+            while (m < s.Length)
+            {
+                if (s[m] == pattern[n])
+                {
+                    m++;
+                    n++;
+                }
+
+                // abacd   n
+                // abababacd  m
+                if (n == pattern.Length)
+                {
+                    list.Add(m - n);
+                    n = 0;
+                    if (m != 0)
+                        m--;
+                }
+                else if (m < s.Length && s[m] != pattern[n])
+                {
+                    if (n == 0)
+                        m++;
+                    else
+                        n = patterns[n - 1];
+                }
+
+            }
+
+            return list;
+        }
         //(()))(
         public static int LongestBalancedSubstring(string str)
         {
