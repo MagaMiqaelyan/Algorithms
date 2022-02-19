@@ -175,13 +175,48 @@ namespace Leetcode
 
             #endregion
 
+
             //points = [[1, 3],[3,3],[5,3],[2,2]], queries = [[2, 3, 1],[4,3,1],[1,1,2]]
             //CountPoints(new int[][] { new int[] {1,3}, new int[] {3,3}, new int[] {5,3}, new int[] {2,2}},
             //    new int[][] { new int[] { 2, 3, 1 }, new int[] { 4, 3, 1 }, new int[] { 1, 1, 2 } });
             //MinOperations("001011");
             //MaxWidthOfVerticalArea(new int[][] { new int[] { 3, 1 }, new int[] { 9, 0 }, new int[] { 1,0 },
             //    new int[] { 1, 4 }, new int[] {5, 3 }, new int[] { 8, 8 } });
-           // CombinationIterator("gkosu", 3);
+            // CombinationIterator("gkosu", 3);
+        }
+
+
+        IList<string> result = new List<string>();
+        private void DFS(string num, int target, StringBuilder expression, decimal prevNum, decimal prevSum, int idx)
+        {
+            if (idx == num.Length && prevSum == target)
+            {
+                result.Add(expression.ToString());
+                return;
+            }
+
+            for (var i = idx; i < num.Length; i++)
+            {
+                if (num[idx] == '0' && i != idx) break; // 0 ok, but 01 isn't
+
+                var curNumStr = num.Substring(idx, i - idx + 1);
+                var curNum = System.Convert.ToDecimal(curNumStr);
+                var expressionLen = expression.Length;
+                if (idx == 0)
+                {
+                    DFS(num, target, expression.Append(curNum), curNum, curNum, i + 1);
+                    expression.Length = expressionLen;
+                }
+                else
+                {
+                    DFS(num, target, expression.Append('+').Append(curNum), curNum, prevSum + curNum, i + 1);
+                    expression.Length = expressionLen;
+                    DFS(num, target, expression.Append('-').Append(curNum), -curNum, prevSum - curNum, i + 1);
+                    expression.Length = expressionLen;
+                    DFS(num, target, expression.Append('*').Append(curNum), prevNum * curNum, (prevNum * curNum) + (prevSum - prevNum), i + 1);
+                    expression.Length = expressionLen;
+                }
+            }
         }
 
         private static string _characters;

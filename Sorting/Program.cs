@@ -261,39 +261,36 @@ namespace Sorting
                 z--;
             }
         }
-        static void Insertion(List<long> list)
+        public static int[] InsertionSort(int[] array)
         {
-            for (int i = 1; i < list.Count; i++)
+            for (int i = 1; i < array.Length; i++)
             {
-                var _index = i - 1;
-                var temp = list[i];
-                while (_index >= 0 && temp >= list[_index])
+                var currentIdx = i;
+                while (currentIdx > 0 && array[currentIdx] < array[currentIdx - 1])
                 {
-                    list[_index + 1] = list[_index--];
+                    var temp = array[currentIdx - 1];
+                    array[currentIdx - 1] = array[currentIdx];
+                    array[currentIdx] = temp;
+                    currentIdx--;
                 }
-                list[_index + 1] = temp;
             }
+            return array;
         }
-        static void Selection(List<long> list)
+        static int[] Selection(int[] array)
         {
-            for (int i = 0; i < list.Count - 1; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                int max_index = i;
-                for (int j = i + 1; j < list.Count; j++)
+                var minIdx = i;
+                for (int j = i + 1; j < array.Length; j++)
                 {
-                    if (list[j] > list[max_index])
-                    {
-                        max_index = j;
-                    }
+                    if (array[j] < array[minIdx])
+                        minIdx = j;
                 }
-
-                if (max_index != i)
-                {
-                    list[max_index] = list[max_index] + list[i];
-                    list[i] = list[max_index] - list[i];
-                    list[max_index] = list[max_index] - list[i];
-                }
+                var temp = array[i];
+                array[i] = array[minIdx];
+                array[minIdx] = temp;
             }
+            return array;
         }
         static List<long> SortMerge(List<long> list)
         {

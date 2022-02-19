@@ -9,6 +9,7 @@ namespace AlgoExpert
     {
         static void Main(string[] args)
         {
+            #region Examples
             // ThreeNumberSum(new int[] { 12, 3, 1, 2, -6, 5, -8, 6 }, 0);
             // ArrayOfProducts(new int[] { 5, 1, 4, 2 });
             // SmallestDifference(new int[] { -1, 5, 10, 20, 28, 3 }, new int[] { 26, 134, 135, 15, 17 });
@@ -26,6 +27,296 @@ namespace AlgoExpert
             //UnderscorifySubstring("testthis is a testtest to see if testestest it works", "test");
             // LongestSubstringWithoutDuplication("abc");
             //var c = SmallestSubstringContaining("abcd$ef$axb$c$", "$$abf");
+            //Console.WriteLine('a' - 'z');
+            //Console.WriteLine('z' - 'a');
+            //var s = "OOOO";
+            //var s2 = s.Split("O", StringSplitOptions.RemoveEmptyEntries);
+            //MergeOverlappingIntervals(new int[][]
+            //{
+            //    new int[]{ 2, 3 }, new int[]{ 4, 5}, new int[]{6,7 }, new int[]{8, 9}, new int[]{ 1,10},
+            //});
+            //Console.WriteLine(AddDigits(38));
+            //Partition("aab");
+            //var s1 = new StringBuilder("abgh");
+            //var dict = new Dictionary<string, List<string>>();            
+            // var d = dict.Values.ToList();
+            // Console.WriteLine(FractionToDecimal(-1, -2147483648));
+            // var l = new List<string>
+            //{
+            //   "3","30","34","5","9"
+            //};
+            // l.OrderByDescending(x => x, Comparer<string>.Create((x, y) => (x + y).CompareTo(y + x)));
+
+            // var nums = new int[] { -1, 2, 2 };
+            // HasSingleCycle(nums);
+
+            //Array.Sort(new int[7][], (a, b) => a[0].CompareTo(b[0]));
+            //var d2 = QuickSort(new int[] { 3, 1, 2 });
+            //AllSubs("aba", d);
+            #endregion
+
+            //var all = Math.Pow(5000, 6);
+
+            //var d = new List<string>();
+            //var s = new StringBuilder();
+            //var h = new HashSet<string>(d);
+            //combinations = new List<IList<int>>();
+            //Sum(new int[] { 2, 3, 6, 7}, 7, 0,0, new List<int>());
+            //var dp = new int[4][];
+            //dp[0] = new int[10];
+            //Generate(4);
+
+            // n = 3, rollMax = [1, 1, 1, 2, 2, 3]
+            DieSimulator(3, new int[] { 1, 1, 1, 2, 2, 30 });
+        }
+
+        public static int DieSimulator(int n, int[] rollMax)
+        {
+            long mod = (long)Math.Pow(10, 9) + 7;
+            var dp = new long[n + 1, 6];
+            var sum = new long[n + 1];
+            sum[0] = 1;
+            for (int i = 1; i <= n; ++i)
+            {
+                for (int j = 0; j < 6; ++j)
+                {
+                    for (int k = 1; k <= rollMax[j] && i - k >= 0; ++k)
+                    {
+                        dp[i, j] = (dp[i, j] + sum[i - k] - dp[i - k, j] + mod) % mod;
+                    }
+                    sum[i] = (sum[i] + dp[i, j]) % mod;
+                }
+            }
+
+            return (int)sum[n];
+        }
+        public static IList<IList<int>> Generate(int rowIndex)
+        {
+            var dp = new List<IList<int>>();
+            dp.Add(new List<int> { 1 });
+            dp.Add(new List<int> { 1, 1 });
+            for (int i = 2; i < rowIndex; i++)
+            {
+                dp.Add(new List<int>() { 1 });
+                for (int j = 0; j < i - 1; j++)
+                {
+                    //dp[i][j + 1] = dp[i - 1][j] + dp[i - 1][j + 1];
+                    dp[i].Add(dp[i - 1][j] + dp[i - 1][j + 1]);
+                }
+                dp[i].Add(1);
+            }
+
+            return dp;
+        }
+
+        public static IList<int> GetRow(int rowIndex)
+        {
+
+            var dp = new int[rowIndex + 1][];
+            dp[0] = new int[] { 1 };
+            dp[1] = new int[] { 1, 1 };
+            for (int i = 2; i < dp.Length; i++)
+            {
+                dp[i] = new int[i + 1];
+                dp[i][0] = 1;
+                dp[i][i] = 1;
+                for (int j = 0; j < dp[i].Length - 2; j++)
+                {
+                    dp[i][j + 1] = dp[i - 1][j] + dp[i - 1][j + 1];
+                }
+            }
+            return dp[rowIndex].ToList();
+        }
+
+        private static IList<IList<int>> combinations;
+        private static void Sum(int[] candidates, int target, int sum, int startIdx, List<int> current)
+        {
+            if (sum > target) return;
+            if (sum == target)
+            {
+                combinations.Add(new List<int>(current));
+                return;
+            }
+            for (int i = startIdx; i < candidates.Length; i++)
+            {
+                current.Add(candidates[i]);
+                Sum(candidates, target, sum + candidates[i],i, current);
+                current.RemoveAt(current.Count - 1);
+
+            }
+        }
+        private static void AllSubs(string str, List<string> sub)
+        {
+            if (str.Length == 0)
+            {
+                return;
+            }
+            for (int i = 0; i < str.Length; i++)
+            {
+                var subString = str.Substring(0, i + 1);
+                sub.Add(subString);
+                AllSubs(str.Substring(i + 1), sub);
+            }
+        }
+        public static int[] QuickSort(int[] array)
+        {
+            int i = 1;
+            while (i <= array.Length - 1)
+            {
+                Sort(1, array.Length - i, 0, array);
+                i++;
+            }
+            return array;
+        }
+
+        public static void Sort(int left, int right, int pivot, int[] arr)
+        {
+            while (left <= right)
+            {
+                if (arr[pivot] < arr[left] && arr[pivot] > arr[right])
+                {
+                    var temp1 = arr[left];
+                    arr[left] = arr[right];
+                    arr[right] = temp1;
+                }
+
+                if (arr[pivot] <= arr[right])
+                    right--;
+                if (arr[pivot] >= arr[left])
+                    left++;
+            }
+
+            var temp = arr[right];
+            arr[right] = arr[pivot];
+            arr[pivot] = temp;
+
+        }
+
+        public static bool HasSingleCycle(int[] array)
+        {
+            var visitedCount = 0;
+            var currentIdx = 0;
+            var n = array.Length;
+            while (visitedCount < n)
+            {
+                if (visitedCount > 0 && currentIdx == 0) return false;
+                visitedCount++;
+                currentIdx = (currentIdx + array[currentIdx]) % n;
+                currentIdx = currentIdx >= 0 ? currentIdx : n + currentIdx;
+            }
+            return currentIdx == 0;
+        }
+
+        public static IList<IList<string>> Partition(string s)
+        {
+            result = new List<IList<string>>();
+            Rec(s, new List<string>());
+            return result;
+        }
+
+        private static bool IsPalindrome(string str)
+        {
+            if (str.Length == 1) return true;
+            for (int i = 0; i <= str.Length / 2; i++)
+            {
+                if (str[i] != str[str.Length - i - 1])
+                    return false;
+            }
+            return true;
+        }
+        private static List<IList<string>> result;
+        private static void Rec(string str, List<string> sub)
+        {
+            if (str.Length == 0)
+            {
+                result.Add(new List<string>(sub));
+                return;
+            }
+            for (int i = 0; i < str.Length; i++)
+            {
+                var subString = str.Substring(0, i + 1);
+                if (IsPalindrome(subString))
+                {
+                    sub.Add(subString);
+                    Rec(str.Substring(i + 1), sub);
+                    sub.RemoveAt(sub.Count - 1);
+                }
+            }
+        }
+
+        public static string FractionToDecimal(int numerator, int denominator)
+        {
+            var res = new StringBuilder();
+            var sign = (numerator > 0 == denominator > 0) || numerator == 0 ? "" : "-";
+            res.Append(sign);
+            long numer = Math.Abs((long)numerator);
+            long den = Math.Abs((long)denominator);
+            res.Append(numer / den);
+            long rem = numer % den;
+            if (rem == 0) return res.ToString();
+            res.Append('.');
+            var map = new Dictionary<long, int>();
+            while (!map.ContainsKey(rem))
+            {
+                map[rem] = res.Length;
+                rem *= 10;
+                res.Append(rem / den);
+                rem %= den;
+            }
+
+            res.Insert(map[rem], "(");
+            res.Append(")");
+
+            return res.ToString().Replace("(0)", "");
+        }
+        public static int AddDigits(int num)
+        {
+            if (num < 10) return num;
+
+            var current = 0;
+            while (num > 9)
+            {
+                current += (num / 10);
+                num %= 10;
+            }
+            return AddDigits(current + num);
+        }
+        //[2, 3],
+        //[4, 5],
+        //[6, 7],
+        //[8, 9],
+        //[1, 10]
+
+        public static int[][] MergeOverlappingIntervals(int[][] intervals)
+        {
+            var jadge = new List<int[]>();
+            intervals = intervals.OrderBy(x => x[0]).ToArray();
+            var prev = intervals[0];
+
+            for (int i = 1; i < intervals.Length; i++)
+            {
+                var temp = new int[] { intervals[i][0], intervals[i][1] };
+                if (prev[1] >= temp[1] && prev[0] <= temp[0])
+                    continue;
+                else if (prev[1] >= temp[0] && temp[1] >= prev[1])
+                {
+                    jadge[jadge.Count - 1][1] = temp[1];
+                }
+                else
+                {
+                    jadge.Add(temp);
+                }
+                prev = temp;
+            }
+            var result = new int[jadge.Count][];
+            for (int i = 0; i < jadge.Count; i++)
+            {
+                result[i] = jadge[i];
+
+            }
+            var sorted = new Dictionary<int, int>();
+            var indecies = sorted.OrderBy(s => s.Value).Select(x => x.Key).ToList();
+            return result;
         }
 
         public static string SmallestSubstringContaining(string bigstring, string smallstring)
