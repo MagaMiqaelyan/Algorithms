@@ -443,4 +443,80 @@ namespace Sorting
             }
         }
     }
+
+    public class MinHeap
+    {
+        public List<int> heap = new List<int>();
+
+        public MinHeap(List<int> array)
+        {
+            heap = buildHeap(array);
+        }
+
+        public List<int> buildHeap(List<int> array)
+        {
+            var first = array.Count / 2 - 1;
+            for (int i = first; i >= 0; i--)
+                siftDown(i, array.Count - 1, array);
+            return array;
+        }
+
+        public void siftDown(int currentIdx, int endIdx, List<int> heap)
+        {
+            var largest = currentIdx;
+            var l = currentIdx * 2 + 1;
+            var r = currentIdx * 2 + 2;
+
+            if (l <= endIdx && heap[l] < heap[largest])
+                largest = l;
+            if (r <= endIdx && heap[r] < heap[largest])
+                largest = r;
+
+            if (largest != currentIdx)
+            {
+                var temp = heap[largest];
+                heap[largest] = heap[currentIdx];
+                heap[currentIdx] = temp;
+                siftDown(largest, endIdx, heap);
+            }
+        }
+
+        public void siftUp(int currentIdx, List<int> heap)
+        {
+            var parentIdx = (currentIdx - 1) / 2;
+            while (currentIdx > 0 && heap[parentIdx] > heap[currentIdx])
+            {
+                Swap(parentIdx, currentIdx);
+                currentIdx = parentIdx;
+                parentIdx = (currentIdx - 1) / 2;
+            }
+        }
+
+        public int Peek()
+        {
+            return heap[0];
+        }
+
+        public int Remove()
+        {
+            Swap(0, heap.Count - 1);
+            var value = heap[heap.Count - 1];
+            heap.RemoveAt(heap.Count - 1);
+            siftDown(0, heap.Count - 1, heap);
+            return value;
+        }
+
+        public void Insert(int value)
+        {
+            heap.Add(value);
+            siftUp(heap.Count - 1, heap);
+        }
+
+        private void Swap(int i, int j)
+        {
+            var temp = heap[i];
+            heap[i] = heap[j];
+            heap[j] = temp;
+        }
+    }
 }
