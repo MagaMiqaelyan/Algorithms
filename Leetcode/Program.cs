@@ -176,6 +176,7 @@ namespace Leetcode
             #endregion
 
 
+
             //points = [[1, 3],[3,3],[5,3],[2,2]], queries = [[2, 3, 1],[4,3,1],[1,1,2]]
             //CountPoints(new int[][] { new int[] {1,3}, new int[] {3,3}, new int[] {5,3}, new int[] {2,2}},
             //    new int[][] { new int[] { 2, 3, 1 }, new int[] { 4, 3, 1 }, new int[] { 1, 1, 2 } });
@@ -183,8 +184,93 @@ namespace Leetcode
             //MaxWidthOfVerticalArea(new int[][] { new int[] { 3, 1 }, new int[] { 9, 0 }, new int[] { 1,0 },
             //    new int[] { 1, 4 }, new int[] {5, 3 }, new int[] { 8, 8 } });
             // CombinationIterator("gkosu", 3);
+            //FirstUniqChar("loveleetcode"); [[2],[3,4],[6,5,7],[4,1,8,3]]
+            //MinimumTotal(new List<IList<int>>
+            //{
+            //    new List<int>
+            //    {
+            //        2
+            //    },
+            //    new List<int>
+            //    {
+            //        3,4
+            //    },
+            //    new List<int>
+            //    {
+            //        6,5,7
+            //    },
+            //    new List<int>
+            //    {
+            //        4,1,8,3
+            //    },
+            //});
+
+            //GuessNumber(2126753390);
+            StrStr("mississippi", "issip");
         }
 
+        public static int StrStr(string haystack, string needle)
+        {
+            if (needle.Length == 0) return 0;
+            for (int i = 0; i + needle.Length <= haystack.Length; i++)
+            {
+                if (haystack[i] == needle[0])
+                {
+                    var x = haystack.Substring(i, needle.Length);
+                    if ( x == needle) 
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        //2126753390
+        //1702766719
+        public static int GuessNumber(int n)
+        {
+            var left = 1;
+            var right = n;
+            while (left <= right)
+            {
+                var mid = left + (right - left) / 2;
+                var g = 1702766719;
+                if (g == 0)
+                    return mid;
+                else if (g == -1) right = mid - 1;
+                else left = mid + 1;
+
+            }
+            return 0;
+        }
+
+        public static int MinimumTotal(IList<IList<int>> triangle)
+        {
+            if (triangle.Count == 1) return triangle[0][0];
+            var dp = new int[triangle.Count + 1];
+
+            for (int i = triangle.Count - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < triangle[i].Count; j++)
+                {
+                    dp[j] = Math.Min(dp[j], dp[j + 1]) + triangle[i][j];
+                }
+            }
+            return dp[0];
+        }
+        public static int FirstUniqChar(string s)
+        {
+            var uniqIndex = int.MaxValue;
+            var letters = new int[26];
+            for (int i = 0; i < s.Length; i++)
+            {
+                letters[s[i] - 'a']++;
+                if (uniqIndex != int.MaxValue && letters[s[uniqIndex] - 'a'] > 1) uniqIndex = int.MaxValue;
+                if (letters[s[i] - 'a'] == 1)
+                    uniqIndex = Math.Min(uniqIndex, i);
+            }
+
+            return uniqIndex == int.MaxValue ? -1 : uniqIndex;
+        }
 
         IList<string> result = new List<string>();
         private void DFS(string num, int target, StringBuilder expression, decimal prevNum, decimal prevSum, int idx)

@@ -40,7 +40,7 @@ namespace AlgoExpert
             //var s1 = new StringBuilder("abgh");
             //var dict = new Dictionary<string, List<string>>();            
             // var d = dict.Values.ToList();
-            // Console.WriteLine(FractionToDecimal(-1, -2147483648));
+            //Console.WriteLine(FractionToDecimal(4,333));
             // var l = new List<string>
             //{
             //   "3","30","34","5","9"
@@ -53,7 +53,6 @@ namespace AlgoExpert
             //Array.Sort(new int[7][], (a, b) => a[0].CompareTo(b[0]));
             //var d2 = QuickSort(new int[] { 3, 1, 2 });
             //AllSubs("aba", d);
-            #endregion
 
             //var all = Math.Pow(5000, 6);
 
@@ -65,10 +64,161 @@ namespace AlgoExpert
             //var dp = new int[4][];
             //dp[0] = new int[10];
             //Generate(4);
-
             // n = 3, rollMax = [1, 1, 1, 2, 2, 3]
-            DieSimulator(3, new int[] { 1, 1, 1, 2, 2, 30 });
+            //DieSimulator(3, new int[] { 1, 1, 1, 2, 2, 30 });
+            // var arr = new int[] { 1, 0, -1, 0, -2, 2 };
+            // Array.Sort(arr);
+            //var r =  KSum(arr, 0, 5, 0);
+            //ReverseParentheses("(abcd)");
+            //CoinChange(new int[] { 1, 2, 5 }, 11);
+
+            //FloodFill(new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 1, 1 } }, 1, 1, 1);
+            //var map = new Dictionary<string, int>();
+            //map.OrderByDescending(x => x.Value).Take(4).OrderBy(x => x.Value).ThenByDescending(x => x.Key)
+            //    .Select(s => s.Key).ToList();
+            #endregion
+
+            MatrixBlockSum(new int[][] { new int[] { 1, 2, 3 }, 
+                                         new int[] { 4, 5, 6 },
+                                         new int[] { 7, 8, 9 },
+            }, 1);
+
         }
+
+        public static int[][] MatrixBlockSum(int[][] mat, int k)
+        {
+            var ans = new int[mat.Length][];
+
+            for (int i = 0; i < mat.Length; i++)
+            {
+                ans[i] = new int[mat[i].Length];
+                for (int j = 0; j < mat[i].Length; j++)
+                {
+                    var rStart = Math.Max(0, i - k);
+                    var rEnd = Math.Min(mat.Length - 1, i + k);
+
+                    var cStart = Math.Max(0, j - k);
+                    var cEnd = Math.Min(mat[i].Length - 1, j + k);
+
+                    for (int m = rStart; m <= rEnd; m++)
+                        for (int n = cStart; n <= cEnd; n++)
+                            ans[i][j] += mat[m][n];
+                }
+            }
+            return ans;
+        }
+
+        public static int[][] FloodFill(int[][] image, int sr, int sc, int newColor)
+        {
+            Fill(image, sr, sc, newColor, image[sr][sc]);
+            return image;
+        }
+        public static void Fill(int[][] image, int sr, int sc, int newColor, int oldColor)
+        {
+            if (sr >= image.Length || sr < 0 || sc >= image[0].Length || sc < 0) return;
+            if (image[sr][sc] != oldColor) return;
+
+            image[sr][sc] = newColor;
+
+            Fill(image, sr + 1, sc, newColor, oldColor);
+            Fill(image, sr - 1, sc, newColor, oldColor);
+            Fill(image, sr, sc - 1, newColor, oldColor);
+            Fill(image, sr, sc + 1, newColor, oldColor);
+        }
+        public static int CoinChange(int[] coins, int amount)
+        {
+            int[] d = new int[amount + 1];
+
+            for (int i = 1; i <= amount; i++)
+            {
+                d[i] = int.MaxValue;
+                for (int j = 0; j < coins.Length; j++)
+                {
+                    if (i >= coins[j] && d[i - coins[j]] != int.MaxValue)
+                    {
+                        d[i] = Math.Min(d[i], 1 + d[i - coins[j]]);
+                    }
+                }
+            }
+            return d[amount] == int.MaxValue ? -1 : d[amount];
+        }
+        public static string ReverseParentheses(string s)
+        {
+            var stack = new Stack<char>();
+
+            foreach (var ch in s)
+            {
+                if (ch == ')')
+                {
+                    var current = new StringBuilder();
+                    while (stack.Count > 0 && stack.Peek() != ')')
+                    {
+                        current.Append(stack.Pop());
+                    }
+                    stack.Pop();
+                    for (int j = 0; j < current.Length; j++)
+                        stack.Push(current[j]);
+                }
+                else
+                    stack.Push(ch);
+            }
+
+            var res = new char[stack.Count];
+            var i = stack.Count - 1;
+            while (stack.Count > 0)
+            {
+                res[i--] = stack.Pop();
+            }
+            return new string(res.Reverse().ToArray());
+        }
+        public static IList<IList<int>> KSum(int[] nums, int start, int k, int target)
+        {
+            var len = nums.Length;
+            var res = new List<IList<int>>();
+            if (k == 2)
+            {
+                var left = start;
+                var right = len - 1;
+                while (left < right)
+                {
+                    var sum = nums[left] + nums[right];
+                    if (sum == target)
+                    {
+                        res.Add(new List<int> { nums[left], nums[right] });
+                        while (left < right && nums[left] == nums[left + 1])
+                            left++;
+                        while (left < right && nums[right] == nums[right - 1])
+                            right--;
+                        left++;
+                        right--;
+                    }
+                    else
+                        if (sum < target) left++;
+                    else
+                        right--;
+                }
+            }
+            else
+            {
+                for (int i = start; i <= len - k; i++)
+                {
+                    while (i > start && i < len - 1 && nums[i] == nums[i - 1])
+                        i++;
+                    var temp = KSum(nums, i + 1, k - 1, target - nums[i]);
+                    foreach (var element in temp)
+                    {
+                        element.Add(nums[i]);
+                    }
+                    foreach (var val in temp)
+                    {
+                        res.Add(val);
+                    }
+                }
+            }
+
+            return res;
+        }
+
 
         public static int DieSimulator(int n, int[] rollMax)
         {
@@ -255,6 +405,8 @@ namespace AlgoExpert
             long rem = numer % den;
             if (rem == 0) return res.ToString();
             res.Append('.');
+
+
             var map = new Dictionary<long, int>();
             while (!map.ContainsKey(rem))
             {

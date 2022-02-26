@@ -631,5 +631,59 @@ namespace Graph
 
             return count;
         }
+
+        public int[] DijkstrasAlgorithm(int start, int[][][] edges)
+        {
+            var vertexCount = edges.Length;
+            var shortestDist = new int[vertexCount];
+            var visited = new HashSet<int>();
+
+            for (int i = 0; i < vertexCount; i++)
+                shortestDist[i] = int.MaxValue;
+
+            shortestDist[start] = 0;
+
+            while (vertexCount != visited.Count)
+            {
+                var vertexData = GetVertexWithMinDistance(shortestDist, visited);
+                var u = vertexData[0];
+                var currentDist = vertexData[1];
+                if (currentDist == int.MaxValue) break;
+                visited.Add(u);
+
+                foreach (var edge in edges[u])
+                {
+                    var destination = edge[0];
+                    var destinationDist = edge[1];
+
+                    if (visited.Contains(destination)) continue;
+                    if (currentDist + destinationDist < shortestDist[destination])
+                        shortestDist[destination] = currentDist + destinationDist;
+                }
+
+            }
+            for (int i = 0; i < vertexCount; i++)
+            {
+                if (shortestDist[i] == int.MaxValue)
+                    shortestDist[i] = -1;
+            }
+            return shortestDist;
+        }
+
+        private int[] GetVertexWithMinDistance(int[] shortestDist, HashSet<int> visited)
+        {
+            var min = int.MaxValue;
+            var minIndex = -1;
+
+            for (int i = 0; i < shortestDist.Length; i++)
+                if (!visited.Contains(i) && shortestDist[i] <= min)
+                {
+                    min = shortestDist[i];
+                    minIndex = i;
+                }
+
+            return new int[] { minIndex, min };
+        }
+
     }
 }
