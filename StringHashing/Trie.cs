@@ -39,9 +39,9 @@ namespace StringHashing
                 }
 
                 current = current.Children[s[i]];
-                if (i == s.Length - 1)
-                    current.IsWord = true;
             }
+
+            current.IsWord = true;
         }
 
         public List<string> GetWordsForPrefix(string pre)
@@ -71,6 +71,7 @@ namespace StringHashing
 
         public bool Search(string key)
         {
+
             var current = root;
 
             foreach (var k in key)
@@ -82,6 +83,28 @@ namespace StringHashing
             }
 
             return current != null && current.IsWord;
+        }
+
+        public bool Check(string str)
+        {
+            return Check(str, 0, 0, root);
+        }
+
+        private bool Check(string str, int index, int count, TrieNode current)
+        {
+            var c = str[index];
+            if (!current.Children.ContainsKey(c)) return false;
+            if (str.Length - 1 == index)
+                return current.Children[c].IsWord && count + 1 >= 2;
+
+            if (current.Children[c].IsWord)
+            {
+                var rest = Check(str, index + 1, count + 1, root);
+                if (rest) return true;
+            }
+
+
+            return Check(str, index + 1, count, current.Children[c]);
         }
 
         //public void SearchPrefix(string word, int cost)

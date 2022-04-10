@@ -1,80 +1,273 @@
-﻿using System;
+﻿using HeapStackQueue;
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 
 namespace Leetcode
 {
-    public class TreeNode
+    public class File
     {
-        public int val;
-        public TreeNode left;
-        public TreeNode right;
-        public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
+        public bool IsDir { get; set; }
+        public string Content { get; set; }
+        public List<File> Children { get; set; }
+        public string Name { get; set; }
+
+        public File(bool isDir, string name)
         {
-            this.val = val;
-            this.left = left;
-            this.right = right;
+            IsDir = isDir;
+            Name = name;
+            Children = new List<File>();
+            Content = "";
         }
     }
 
-    public class Node
+    public class FileSystem
     {
-        public int val;
-        public IList<Node> children;
+        private File root;
 
-        public Node() { }
-
-        public Node(int _val)
+        public FileSystem()
         {
-            val = _val;
-            children = new List<Node>();
+            root = new File(true, "/");
         }
 
-        public Node(int _val, IList<Node> _children)
+        /// <summary>
+        /// Given a path in string format. If it is a file path, return a list that only contains this file’s name.
+        /// If it is a directory path, return the list of file and directory names in this directory. 
+        /// Your output (file and directory names together) should in lexicographic order.
+        public List<string> ls(string path)
         {
-            val = _val;
-            children = _children;
-        }
-    }
-    public class CombinationIterator
-    {
-        string _characters;
-        int _combinationLenght;
-        Queue<string> stack = new Queue<string>();
+            var file = GetLast(path);
 
-        public CombinationIterator(string characters, int combinationLength)
-        {
-            _characters = characters;
-            _combinationLenght = combinationLength;
-            if (characters.Length >= combinationLength)
+            var res = new List<string>();
+            if (file.IsDir)
             {
-                for (int i = 0; i < characters.Length; i++)
+                foreach (var f in file.Children)
+                    res.Add(f.Name);
+            }
+            else
+                res.Add(file.Name);
+            return res;
+        }
+
+        //Given a directory path that does not exist, you should make a new directory according to the path.
+        // If the middle directories in the path don’t exist either, you should create them as well.
+        public void mkdir(string path)
+        {
+            GetAndCreate(path, true);
+        }
+
+        //Given a file path and file content in string format.If the file doesn’t exist, you need to create that file containing given content.
+        //If the file already exists, you need to append given content to original content.
+        public void addContentToFile(string filePath, string content)
+        {
+            var file = GetAndCreate(filePath, false);
+            file.Content += content;
+        }
+
+        // read content
+        public string readContentFromFile(string filePath)
+        {
+            var file = GetLast(filePath);
+            return file.Content;
+        }
+
+        private File GetAndCreate(string path, bool isDir)
+        {
+            var current = root;
+            path = path.Substring(1);
+            var index = path.IndexOf('/');
+
+            while (index >= 0)
+            {
+                var pathName = path.Substring(0, index);
+                if (current.Children.Count == 0)
                 {
+                    var dir = new File(true, pathName);
+                    current.Children.Add(dir);
+                    current = dir;
 
+                    path = path.Substring(index + 1);
+                    index = path.IndexOf('/');
+                    continue;
                 }
+
+                var found = SearchFile(current.Children, pathName);
+                var temp = current.Children[found];
+                if (temp.Name != pathName)
+                {
+                    var dir = new File(true, pathName);
+                    current.Children.Insert(found + 1, dir);
+                    current = dir;
+
+                    path = path.Substring(index + 1);
+                    index = path.IndexOf('/');
+                    continue;
+                }
+
+                current = temp;
+                path = path.Substring(index + 1);
+                index = path.IndexOf('/');
             }
 
-        }
-
-        public string Next()
-        {
-            if (stack.Count != 0)
+            var file = SearchFile(current.Children, path);
+            if (file == -1 || current.Children[file].Name != path)
             {
-                return stack.Dequeue();
+                var f = new File(isDir, path);
+                if (current.Children.Count == 0)
+                    current.Children.Add(f);
+                else
+                    current.Children.Insert(file + 1, f);
+                current = f;
             }
-            return "";
+            else
+                current = current.Children[file];
+
+            return current;
         }
 
-        public bool HasNext()
+        private File GetLast(string path)
         {
-            if (stack.Count == 0) return false;
-            return true;
+            var current = root;
+            path = path.Substring(1);
+            var index = path.IndexOf('/');
+
+            while (index >= 0)
+            {
+                var pathName = path.Substring(0, index);
+                var found = SearchFile(current.Children, pathName);
+                current = current.Children[found];
+                path = path.Substring(index + 1);
+                index = path.IndexOf('/');
+            }
+
+            var file = SearchFile(current.Children, path);
+            if (file < 0) return root;
+            current = current.Children[file];
+            return current;
+        }
+
+        private int SearchFile(List<File> list, string name)
+        {
+            if (list.Count < 1) return -1;
+            var idx = -1;
+            var l = 0;
+            var r = list.Count - 1;
+            while (l <= r)
+            {
+                var mid = l + (r - l) / 2;
+                if (list[mid].Name == name) return mid;
+
+                if (list[mid].Name.CompareTo(name) < 0)
+                {
+                    l = mid + 1;
+                    idx = mid;
+                }
+                else
+                    r = mid - 1;
+            }
+            return idx;
         }
     }
 
+    public class SnakeGame
+    {
+        private bool[,] board;
+        private Queue<int> snake;
+        private int[][] food;
+        private int foodIndex;
+        private int row;
+        private int col;
+        private int score;
+        private int width;
+        private int height;
 
+        public SnakeGame(int width, int height, int[][] food)
+        {
+            this.width = width;
+            this.height = height;
+            this.food = food;
+
+            board = new bool[height, width];
+            board[0, 0] = true;
+            snake = new Queue<int>();
+            snake.Enqueue(0);
+        }
+
+        public int Move(string direction)
+        {
+            if (score == -1) return score;
+
+            if (direction == "L") col--;
+            else if (direction == "R") col++;
+            else if (direction == "U") row--;
+            else row++;
+
+            if (row < 0 || col < 0 || row >= height || col >= width)
+            {
+                score = -1;
+                return score;
+            }
+
+            if (foodIndex == food.Length || row != food[foodIndex][0] || col != food[foodIndex][1])
+            {
+                var tail = snake.Dequeue();
+                board[tail / width, tail % width] = false;
+            }
+            else
+            {
+                score++;
+                foodIndex++;
+            }
+
+            if (board[row, col])
+            {
+                score = -1;
+                return score;
+            }
+            else
+            {
+                snake.Enqueue(row * width + col);
+                board[row, col] = true;
+            }
+            return score;
+        }
+    }
+    public class TicTacToe
+    {
+        private int[] rows;
+        private int[] columns;
+        private int diagonal;
+        private int antiDiagonal;
+        private int n;
+        public TicTacToe(int n)
+        {
+            rows = new int[n];
+            columns = new int[n];
+            this.n = n;
+        }
+
+        public int Move(int x, int y, int player)
+        {
+            var add = player == 1 ? 1 : -1;
+
+            rows[x] += add;
+            columns[y] += add;
+
+            if (x == y)
+                diagonal += add;
+            if (x + y == n - 1)
+                antiDiagonal += add;
+
+            if (Math.Abs(rows[x]) == n || Math.Abs(columns[y]) == n || Math.Abs(diagonal) == n || Math.Abs(antiDiagonal) == n)
+                return player;
+
+            return 0;
+        }
+    }
     class Program
     {
         static void Main(string[] args)
@@ -172,11 +365,6 @@ namespace Leetcode
             //    new TreeNode(4)), new TreeNode(6, new TreeNode(7), new TreeNode(9)));
             //KthSmallest(treeNode, 3);
             //GenerateTrees(3);
-
-            #endregion
-
-
-
             //points = [[1, 3],[3,3],[5,3],[2,2]], queries = [[2, 3, 1],[4,3,1],[1,1,2]]
             //CountPoints(new int[][] { new int[] {1,3}, new int[] {3,3}, new int[] {5,3}, new int[] {2,2}},
             //    new int[][] { new int[] { 2, 3, 1 }, new int[] { 4, 3, 1 }, new int[] { 1, 1, 2 } });
@@ -204,9 +392,732 @@ namespace Leetcode
             //        4,1,8,3
             //    },
             //});
-
             //GuessNumber(2126753390);
-            StrStr("mississippi", "issip");
+            //StrStr("mississippi", "issip");
+            //SwapPairs(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))));
+
+            //BraceExpansionII("{{a,z},a{b,c},{ab,z}}");
+
+            //IsPalindrome(new ListNode(1, new ListNode(2, new ListNode
+            //(2, new ListNode(1)))));
+            //LengthOfLIS(new int[] { 7, 7, 7, 7, 7, 7, 7 });
+            //NumberToWords(1234567891);
+            //var streamReader = new StreamReader(new FileStream("filepath", FileMode.Open, FileAccess.Read), Encoding.UTF8);
+            //var nums = new int[] { 0,1 };
+            //QuickSort(nums, 0, 1);
+
+            //RestoreIpAddresses("25525511135");
+
+            //MinInterval(new int[][]
+            //{
+            //    new int[] { 1,4},
+            //    new int[] {2,4},
+            //    new int[] { 3,6},
+            //    new int[] { 4,4},
+            //}, new int[] { 2, 3, 4, 5 });
+            #endregion
+
+            //var arr = new int[5] { 1, 2, 3, 4, 5 };
+            //var rnd = new Random();
+            //for(int i = 4; i > 1; i--)
+            //{
+            //    var idx = rnd.Next(i - 1);
+
+            //    Console.WriteLine($"{arr[i]}, {arr[idx]}");
+            //    var t = arr[i];
+            //    arr[i] = arr[idx];
+            //    arr[idx] = t;
+            //}
+
+
+            //Console.WriteLine(string.Join(", ", arr));
+            //Console.WriteLine(CuttingMethod(F, 1, -3));
+            //     MostVisitedPatterns(new string[] { "joe", "joe", "joe", "james", "james", "james", "james", "mary", "mary", "mary" },
+            //    new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, new string[] { "home", "about", "career", "home", "cart", "maps", "home", "home", "about", "career" });
+
+            //var snake = new SnakeGame(3, 2, new int[][] { new int[] { 1, 2 }, new int[] { 0, 1 } });
+            //Console.WriteLine(snake.Move("R"));
+            //Console.WriteLine(snake.Move("D"));
+            //Console.WriteLine(snake.Move("R"));
+            //Console.WriteLine(snake.Move("U"));
+            //Console.WriteLine(snake.Move("L"));
+            //Console.WriteLine(snake.Move("U"));
+            //IsMatch("aacb", "a**b");
+            // CanCross(new int[] { 0, 1, 3, 5, 6, 8, 12, 17 });
+            //UniqueLetterString("LEETCODE");
+            //FirstMissingPositive(new int[] { 3, 4, -1, 1 });
+            SumScores("azbazbzaz");
+        }
+        //azbzaz
+        public static long SumScores(string s)
+        {
+            var cnt = s.Length;
+            var temp = s[s.Length - 1].ToString();
+            var j = s.Length - 2;
+            var i = 0;
+            while (j >= 0)
+            {
+                if (i < s.Length && s.Substring(0, i + 1) == temp)
+                {
+                    i++;
+                }
+                else
+                {
+                    cnt += (temp.Length - 1);
+                }
+
+                temp = s[j] + temp;
+                j--;
+
+            }
+            return cnt;
+        }
+        public static int CommonPrefixUtil(string str1, string str2)
+        {
+            var result = 0;
+            int n1 = str1.Length,
+                n2 = str2.Length;
+
+            for (int i = 0, j = 0; i <= n1 - 1 && j <= n2 - 1; i++, j++)
+            {
+                if (str1[i] != str2[j])
+                {
+                    break;
+                }
+                result++;
+            }
+
+            return result;
+        }
+        public static int FirstMissingPositive(int[] nums)
+        {
+            for (int i = 0; i < nums.Length; i++)
+            {
+                while (nums[i] > 0 && nums[i] <= nums.Length && nums[nums[i] - 1] != nums[i])
+                    Swap(i, nums[i] - 1, nums);
+            }
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i] != i + 1) return i + 1;
+            }
+
+            return nums.Length + 1;
+        }
+
+        private static void Swap(int i, int j, int[] nums)
+        {
+            var temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+
+        public static int UniqueLetterString(string s)
+        {
+            var indices = new List<int>[26];
+            for (int i = 0; i < 26; i++)
+            {
+                indices[i] = new List<int>();
+            }
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                indices[s[i] - 'A'].Add(i);
+            }
+
+            long res = 0;
+
+            foreach (var list in indices)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    int prev = i > 0 ? list[i - 1] : -1;
+                    int next = i < list.Count - 1 ? list[i + 1] : s.Length;
+                    long prod = (long)(list[i] - prev) * (next - list[i]);
+                    res += prod;
+                }
+            }
+
+            return (int)res;
+        }
+        public static bool CanCross(int[] stones)
+        {
+            return FrogJump(stones, 0, 0, stones[0], new int[stones.Length, stones.Length]);
+        }
+
+        // 0 not visit, 1 - true, 2 -false
+        private static bool FrogJump(int[] stones, int i, int currentStone, int k, int[,] dp)
+        {
+            while (i < stones.Length && currentStone > stones[i])
+                i++;
+
+            if (currentStone == stones[stones.Length - 1]) return true;
+            if (i >= stones.Length || currentStone != stones[i]) return false;
+
+            if (dp[i, k] > 0)
+                return dp[i, k] == 1;
+
+            var res = FrogJump(stones, i + 1, currentStone + k - 1, k - 1, dp) ||
+                      FrogJump(stones, i + 1, currentStone + k, k, dp) ||
+                      FrogJump(stones, i + 1, currentStone + k + 1, k + 1, dp);
+            dp[i, k] = res ? 1 : 2;
+            return res;
+        }
+
+        public static bool IsMatch(string str, string pattern)
+        {
+            var s = 0;
+            var p = 0;
+            var match = 0;
+            var starIdx = -1;
+            while (s < str.Length)
+            {
+                if (p < pattern.Length && (pattern[p] == '?' || str[s] == pattern[p]))
+                {
+                    s++;
+                    p++;
+                }
+                else if (p < pattern.Length && pattern[p] == '*')
+                {
+                    starIdx = p;
+                    match = s;
+                    p++;
+                }
+                else if (starIdx != -1)
+                {
+                    p = starIdx + 1;
+                    match++;
+                    s = match;
+                }
+                else
+                    return false;
+            }
+
+
+            while (p < pattern.Length && pattern[p] == '*')
+                p++;
+
+            return p == pattern.Length;
+        }
+
+        // Analyze User Website Visit Pattern
+        public static List<string> MostVisitedPatterns(string[] names, int[] timestamp, string[] website)
+        {
+            var n = timestamp.Length;
+            var sessions = new List<List<string>>();
+            for (int i = 0; i < n; i++)
+            {
+                sessions.Add(new List<string>());
+                sessions[i].Add(names[i]);
+                sessions[i].Add(timestamp[i].ToString());
+                sessions[i].Add(website[i]);
+            }
+
+            sessions = sessions.OrderBy(x => int.Parse(x[1])).ToList();
+
+            var visited = new Dictionary<string, List<string>>();
+            for (int i = 0; i < n; i++)
+            {
+                if (!visited.ContainsKey(sessions[i][0]))
+                    visited.Add(sessions[i][0], new List<string>());
+                visited[sessions[i][0]].Add(sessions[i][2]);
+            }
+
+            var maxCount = 0;
+            var maxSeq = "";
+            var sequence = new Dictionary<string, int>();
+            foreach (var visit in visited)
+            {
+                if (visit.Value.Count < 3) continue;
+
+                var subSequences = GetSubsequences(visit.Value);
+                foreach (var sub in subSequences)
+                {
+                    var count = 1;
+                    if (sequence.ContainsKey(sub))
+                        count = ++sequence[sub];
+                    else
+                        sequence.Add(sub, 1);
+
+                    if (count > maxCount)
+                    {
+                        maxCount = count;
+                        maxSeq = sub;
+                    }
+                    else if (count == maxCount && string.Compare(sub, maxSeq) < 0)
+                        maxSeq = sub;
+                }
+            }
+
+            return maxSeq.Split(',').ToList();
+        }
+
+        public static HashSet<string> GetSubsequences(List<string> list)
+        {
+            var res = new HashSet<string>();
+            for (int i = 0; i < list.Count - 2; i++)
+                for (int j = i + 1; j < list.Count - 1; j++)
+                    for (int k = j + 1; k < list.Count; k++)
+                        res.Add(list[i] + "," + list[j] + "," + list[k]);
+            return res;
+        }
+
+        public static double F(double x) => Math.Pow(Math.E, x) - Math.Tan(x);
+
+        public static double CuttingMethod(Func<double, double> f, double xn, double xn_1)
+        {
+            var n = 100;
+            if (f(xn) * f(xn_1) >= 0)
+                return 0;
+            while (n > 1)
+            {
+                var fxn = f(xn);
+                var fxn_1 = f(xn_1);
+
+                var mn = xn - (fxn * (xn - xn_1) / (fxn - fxn_1));
+                var fmn = f(mn);
+                if (fxn * fmn < 0)
+                    xn_1 = mn;
+                else if (fxn_1 * fmn < 0)
+                    xn = mn;
+                else if (fmn == 0)
+                    return mn;
+                else
+                    return 0;
+                n--;
+            }
+
+            return xn - (f(xn) * (xn - xn_1) / (f(xn) - f(xn_1)));
+        }
+
+        public static int[] MinInterval(int[][] intervals, int[] queries)
+        {
+            var query = new int[queries.Length][];
+            for (int i = 0; i < queries.Length; i++)
+            {
+                query[i] = new int[2];
+                query[i][0] = i;
+                query[i][1] = queries[i];
+            }
+
+            var orderedQueries = query.OrderBy(x => x[1]).ToArray();
+            var sort = intervals.OrderBy(x => x[0]).ToArray();
+            var ans = new int[queries.Length];
+            var sortedSet = new Heap<int[]>(Comparer<int[]>.Create((x, y) => (x[1] - x[0]).CompareTo(y[1] - y[0])));
+            var j = 0;
+            foreach (var q in orderedQueries)
+            {
+                while (j < sort.Length && sort[j][0] <= q[1])
+                {
+                    sortedSet.Add(sort[j++]);
+                }
+                while (sortedSet.Count > 0)
+                {
+                    if (sortedSet.Peek()[1] < q[1])
+                        sortedSet.Remove();
+                    else
+                        break;
+                }
+
+                ans[q[0]] = sortedSet.Count <= 0 ? -1 : sortedSet.Peek()[1] - sortedSet.Peek()[0] + 1;
+            }
+
+            return ans;
+        }
+
+        public static IList<string> RestoreIpAddresses(string s)
+        {
+            var res = new List<string>();
+            Restore(s, 0, res, new List<string>());
+            return res;
+        }
+
+        private static void Restore(string s, int i, List<string> result, List<string> current)
+        {
+            if (i == s.Length)
+            {
+                if (current.Count > 4) return;
+                result.Add(string.Join('.', current));
+                return;
+            }
+            for (int j = i; j < i + 3 && j < s.Length; j++)
+            {
+                var sub = s.Substring(i, j - i + 1);
+                if (!IsValid(sub)) continue;
+                current.Add(sub);
+                Restore(s, j + 1, result, current);
+                current.RemoveAt(current.Count - 1);
+
+            }
+        }
+
+        private static bool IsValid(string ip)
+        {
+            if (string.IsNullOrEmpty(ip)) return false;
+            var ipInt = int.Parse(ip);
+            if (ipInt > 255) return false;
+            return ip.Length == ipInt.ToString().Length;
+        }
+        private static void QuickSort(int[] nums, int left, int right)
+        {
+            if (left >= right) return;
+            var p = Partion(nums, left, right);
+            QuickSort(nums, left, p - 1);
+            QuickSort(nums, p + 1, right);
+        }
+
+        private static int Partion(int[] nums, int left, int right)
+        {
+            var pivot = left;
+            left++;
+            while (left <= right)
+            {
+                if (nums[pivot] <= nums[left] && nums[pivot] >= nums[right])
+                {
+                    Swap(nums, left, right);
+                }
+                if (nums[right] >= nums[pivot])
+                    right--;
+                if (nums[left] <= nums[pivot])
+                    left++;
+            }
+            Swap(nums, right, pivot);
+            return right;
+        }
+
+        private static void Swap(int[] nums, int i, int j)
+        {
+            var temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+        public static List<int> GetConsecutiveCustomer(string filepath)
+        {
+            var customeDateMap = new Dictionary<int, List<DateTime>>();
+            var streamReader = new StreamReader(new FileStream(filepath, FileMode.Open, FileAccess.Read), Encoding.UTF8);
+            var consecutiveCustomers = new HashSet<int>();
+            string line;
+            while ((line = streamReader.ReadLine()) != null)
+            {
+                var customerId = int.Parse(line.Split('\t')[1]);
+                var date = DateTime.Parse(line.Split('\t')[0]);
+                if (customeDateMap.ContainsKey(customerId))
+                {
+                    if (customeDateMap[customerId].Count == 3)
+                    {
+                        customeDateMap[customerId].RemoveAt(2);
+                    }
+                    customeDateMap[customerId].Add(date);
+                    if (!consecutiveCustomers.Contains(customerId))
+                    {
+                        if (customeDateMap[customerId].Count == 3
+                        && customeDateMap[customerId][0] == customeDateMap[customerId][1].AddDays(1)
+                        && customeDateMap[customerId][0] == customeDateMap[customerId][2].AddDays(2))
+                        {
+                            consecutiveCustomers.Add(customerId);
+                        }
+                    }
+                }
+                else
+                {
+                    customeDateMap.Add(customerId, new List<DateTime>() { date });
+                }
+            }
+            return consecutiveCustomers.ToList();
+        }
+
+        private static string[] untillTwenty = new string[] { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fiveteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty" };
+        private static string[] tens = new string[] { "", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninty" };
+
+        public static string NumberToWords(int num)
+        {
+            var result = new StringBuilder();
+            if (num <= 20)
+                result.Append(untillTwenty[num]);
+            else if (num < 100)
+                result.Append(tens[num / 10]).Append(" ").Append(NumberToWords(num % 10));
+            else if (num < 1000)
+                result.Append(NumberToWords(num / 100)).Append(" Hundred ").Append(NumberToWords(num % 100));
+            else if (num < 1000000)
+                result.Append(NumberToWords(num / 1000)).Append(" Thousand ").Append(NumberToWords(num % 1000));
+            else if (num < 1000000000)
+                result.Append(NumberToWords(num / 1000000)).Append(" Million ").Append(NumberToWords(num % 1000000));
+            else
+                result.Append(NumberToWords(num / 1000000000)).Append(" Billion ").Append(NumberToWords(num % 1000000000));
+
+            return result.ToString();
+        }
+
+        public static int LengthOfLIS(int[] nums)
+        {
+            var tails = new int[nums.Length];
+            var size = 0;
+            for (int i = 0; i < nums.Length; i++)
+            {
+                var l = 0;
+                var r = size;
+                while (l < r)
+                {
+                    var mid = l + (r - l) / 2;
+                    if (tails[mid] >= nums[i])
+                        r = mid;
+                    else
+                        l = mid + 1;
+                }
+                tails[l] = nums[i];
+                if (l == size) size++;
+            }
+            return size;
+        }
+
+        public static bool IsPalindrome(ListNode head)
+        {
+            ListNode nodeForReverse = head;
+            ListNode temp = new ListNode(head.val);
+            ListNode current = temp;
+            head = head.next;
+            while (head != null)
+            {
+                current.next = new ListNode(head.val);
+                current = current.next;
+                head = head.next;
+            }
+
+            var reverse = Reverse(head, null);
+            while (reverse != null && temp != null)
+            {
+                Console.WriteLine(temp.val);
+                if (reverse.val != temp.val) return false;
+                reverse = reverse.next;
+                temp = temp.next;
+            }
+            return reverse == null && temp == null;
+
+        }
+
+        private static ListNode Reverse(ListNode head, ListNode previous)
+        {
+            if (head == null) return previous;
+            var temp = head.next;
+            head.next = previous;
+            return Reverse(temp, head);
+        }
+
+        public static ListNode ReverseList(ListNode head)
+        {
+            ListNode prev = null;
+            while (head != null)
+            {
+                var newHead = head.next;
+                head.next = prev;
+                prev = head;
+                head = newHead;
+            }
+            return prev;
+        }
+
+        public static IList<string> BraceExpansionII(string expression)
+        {
+            var res = new HashSet<string>();
+            Dfs(expression, 0, "", res);
+            return res.OrderBy(x => x).ToList();
+        }
+
+        private static void Dfs(string exp, int pos, string current, HashSet<string> result)
+        {
+            if (pos == exp.Length)
+            {
+                result.Add(current);
+                return;
+            }
+
+            if (exp[pos] >= 'a' && exp[pos] <= 'z')
+            {
+                Dfs(exp, pos + 1, current + exp[pos], result);
+            }
+            else if (exp[pos] == ',')
+            {
+                result.Add(current);
+                Dfs(exp, pos + 1, "", result);
+            }
+            else if (exp[pos] == '{')
+            {
+                var count = 1;
+                var i = pos + 1;
+                while (count != 0)
+                {
+                    if (exp[i] == '{')
+                        count++;
+                    else if (exp[i] == '}')
+                    {
+                        count--;
+                        if (count == 0) break;
+                    }
+                    i++;
+                }
+
+                var temp = new HashSet<string>();
+                Dfs(exp.Substring(pos + 1, i - pos - 1), 0, "", temp);
+                foreach (var t in temp)
+                    Dfs(exp, i + 1, current + t, result);
+
+            }
+        }
+
+        public static List<string> generateParenthesis(int n)
+        {
+            List<string> list = new List<string>();
+            backtrack(list, "", 0, 0, n);
+            return list;
+        }
+
+        public static void backtrack(List<string> list, string str, int open, int close, int max)
+        {
+
+            if (str.Length == max * 2)
+            {
+                list.Add(str);
+                return;
+            }
+
+            if (open < max)
+                backtrack(list, str + "(", open + 1, close, max);
+            if (close < open)
+                backtrack(list, str + ")", open, close + 1, max);
+        }
+
+        public static int[][] MatrixBlockSum(int[][] mat, int k)
+        {
+            var ans = new int[mat.Length][];
+
+            for (int i = 0; i < mat.Length; i++)
+            {
+                ans[i] = new int[mat[i].Length];
+                for (int j = 0; j < mat[i].Length; j++)
+                {
+                    var rStart = Math.Max(0, i - k);
+                    var rEnd = Math.Min(mat.Length - 1, i + k);
+
+                    var cStart = Math.Max(0, j - k);
+                    var cEnd = Math.Min(mat[i].Length - 1, j + k);
+
+                    for (int m = rStart; m <= rEnd; m++)
+                        for (int n = cStart; n <= cEnd; n++)
+                            ans[i][j] += mat[m][n];
+                }
+            }
+            return ans;
+        }
+
+        public static int[][] FloodFill(int[][] image, int sr, int sc, int newColor)
+        {
+            Fill(image, sr, sc, newColor, image[sr][sc]);
+            return image;
+        }
+        public static void Fill(int[][] image, int sr, int sc, int newColor, int oldColor)
+        {
+            if (sr >= image.Length || sr < 0 || sc >= image[0].Length || sc < 0) return;
+            if (image[sr][sc] != oldColor) return;
+
+            image[sr][sc] = newColor;
+
+            Fill(image, sr + 1, sc, newColor, oldColor);
+            Fill(image, sr - 1, sc, newColor, oldColor);
+            Fill(image, sr, sc - 1, newColor, oldColor);
+            Fill(image, sr, sc + 1, newColor, oldColor);
+        }
+        public static int CoinChange(int[] coins, int amount)
+        {
+            int[] d = new int[amount + 1];
+
+            for (int i = 1; i <= amount; i++)
+            {
+                d[i] = int.MaxValue;
+                for (int j = 0; j < coins.Length; j++)
+                {
+                    if (i >= coins[j] && d[i - coins[j]] != int.MaxValue)
+                    {
+                        d[i] = Math.Min(d[i], 1 + d[i - coins[j]]);
+                    }
+                }
+            }
+            return d[amount] == int.MaxValue ? -1 : d[amount];
+        }
+        public static string ReverseParentheses(string s)
+        {
+            var stack = new Stack<char>();
+
+            foreach (var ch in s)
+            {
+                if (ch == ')')
+                {
+                    var current = new StringBuilder();
+                    while (stack.Count > 0 && stack.Peek() != ')')
+                    {
+                        current.Append(stack.Pop());
+                    }
+                    stack.Pop();
+                    for (int j = 0; j < current.Length; j++)
+                        stack.Push(current[j]);
+                }
+                else
+                    stack.Push(ch);
+            }
+
+            var res = new char[stack.Count];
+            var i = stack.Count - 1;
+            while (stack.Count > 0)
+            {
+                res[i--] = stack.Pop();
+            }
+            return new string(res.Reverse().ToArray());
+        }
+        public static IList<IList<int>> KSum(int[] nums, int start, int k, int target)
+        {
+            var len = nums.Length;
+            var res = new List<IList<int>>();
+            if (k == 2)
+            {
+                var left = start;
+                var right = len - 1;
+                while (left < right)
+                {
+                    var sum = nums[left] + nums[right];
+                    if (sum == target)
+                    {
+                        res.Add(new List<int> { nums[left], nums[right] });
+                        while (left < right && nums[left] == nums[left + 1])
+                            left++;
+                        while (left < right && nums[right] == nums[right - 1])
+                            right--;
+                        left++;
+                        right--;
+                    }
+                    else
+                        if (sum < target) left++;
+                    else
+                        right--;
+                }
+            }
+            else
+            {
+                for (int i = start; i <= len - k; i++)
+                {
+                    while (i > start && i < len - 1 && nums[i] == nums[i - 1])
+                        i++;
+                    var temp = KSum(nums, i + 1, k - 1, target - nums[i]);
+                    foreach (var element in temp)
+                    {
+                        element.Add(nums[i]);
+                    }
+                    foreach (var val in temp)
+                    {
+                        res.Add(val);
+                    }
+                }
+            }
+
+            return res;
         }
 
         public static int StrStr(string haystack, string needle)
@@ -217,8 +1128,8 @@ namespace Leetcode
                 if (haystack[i] == needle[0])
                 {
                     var x = haystack.Substring(i, needle.Length);
-                    if ( x == needle) 
-                    return i;
+                    if (x == needle)
+                        return i;
                 }
             }
             return -1;
@@ -485,7 +1396,7 @@ namespace Leetcode
             BigInteger num1 = l1.val;
             BigInteger num2 = l2.val;
             var result = new ListNode();
-            var cur = result;
+            var pathName = result;
 
             while (l1?.next != null || l2?.next != null)
             {
@@ -511,11 +1422,11 @@ namespace Leetcode
                 var r = sum / cnt;
                 sum %= cnt;
                 cnt /= 10;
-                cur.val = (int)r;
+                pathName.val = (int)r;
                 if (cnt > 0)
                 {
-                    cur.next = new ListNode();
-                    cur = cur.next;
+                    pathName.next = new ListNode();
+                    pathName = pathName.next;
                 }
             }
             return result;
@@ -546,7 +1457,6 @@ namespace Leetcode
             var n = nums.Length;
             var times = Math.Round(n / 3d, MidpointRounding.ToZero);
             var dict = new Dictionary<int, int>();
-
             for (int i = 0; i < n; i++)
             {
                 if (dict.ContainsKey(nums[i]))
@@ -1745,4 +2655,73 @@ namespace Leetcode
             this.next = next;
         }
     }
+
+    public class TreeNode
+    {
+        public int val;
+        public TreeNode left;
+        public TreeNode right;
+        public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
+        {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    public class Node
+    {
+        public int val;
+        public IList<Node> children;
+
+        public Node() { }
+
+        public Node(int _val)
+        {
+            val = _val;
+            children = new List<Node>();
+        }
+
+        public Node(int _val, IList<Node> _children)
+        {
+            val = _val;
+            children = _children;
+        }
+    }
+    public class CombinationIterator
+    {
+        string _characters;
+        int _combinationLenght;
+        Queue<string> stack = new Queue<string>();
+
+        public CombinationIterator(string characters, int combinationLength)
+        {
+            _characters = characters;
+            _combinationLenght = combinationLength;
+            if (characters.Length >= combinationLength)
+            {
+                for (int i = 0; i < characters.Length; i++)
+                {
+
+                }
+            }
+
+        }
+
+        public string Next()
+        {
+            if (stack.Count != 0)
+            {
+                return stack.Dequeue();
+            }
+            return "";
+        }
+
+        public bool HasNext()
+        {
+            if (stack.Count == 0) return false;
+            return true;
+        }
+    }
+
 }
