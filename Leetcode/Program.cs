@@ -415,7 +415,6 @@ namespace Leetcode
             //    new int[] { 3,6},
             //    new int[] { 4,4},
             //}, new int[] { 2, 3, 4, 5 });
-            #endregion
 
             //var arr = new int[5] { 1, 2, 3, 4, 5 };
             //var rnd = new Random();
@@ -446,8 +445,110 @@ namespace Leetcode
             // CanCross(new int[] { 0, 1, 3, 5, 6, 8, 12, 17 });
             //UniqueLetterString("LEETCODE");
             //FirstMissingPositive(new int[] { 3, 4, -1, 1 });
-            SumScores("azbazbzaz");
+            //SumScores("azbazbzaz");
+            #endregion
+
+            //LargestInteger(247);
+            //MaximumProduct(new int[] { 24, 5, 64, 53, 26, 38 }, 54);
+            //MinimizeResult("99+99");
         }
+        public static string MinimizeResult(string expression)
+        {
+            var eq = 0;
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (expression[i] == '+')
+                {
+                    eq = i;
+                    break;
+                }
+            }
+
+            var res = "";
+            var min = int.MaxValue;
+            for (int i = 0; i < eq; i++)
+            {
+                var a = GetValue(expression, 0, i);
+                if (a == 0) a = 1;
+                var b = GetValue(expression, i, eq);
+                for (int j = eq + 2; j <= expression.Length; j++)
+                {
+                    var c = GetValue(expression, eq + 1, j);
+                    var d = GetValue(expression, j, expression.Length);
+                    if (d == 0) d = 1;
+                    var val = a * (b + c) * d;
+                    if (val < min)
+                    {
+                        min = val;
+                        res = string.Concat(expression.Substring(0, i), '(', expression.Substring(i, j - i),  ')', expression.Substring(j));
+                    }
+                }
+            }
+            return res;
+        }
+
+        private static int GetValue(string s, int start, int end)
+        {
+            var res = 0;
+            while (start < end)
+            {
+                res = res * 10 + (s[start++] - '0');
+            }
+            return res;
+        }
+        public static int MaximumProduct(int[] nums, int k)
+        {
+            var heap = new Heap<int>();
+            foreach (var n in nums)
+            {
+                heap.Add(n);
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                var first = heap.Remove();
+                heap.Add(first + 1);
+            }
+            var prod = 1;
+            foreach (var item in heap.GetElements)
+            {
+                prod *= item % (int)Math.Pow(10, 7);
+            }
+            return prod;
+        }
+        public static int LargestInteger(int num)
+        {
+            var odds = new List<int>();
+            var evens = new List<int>();
+
+            var n = num.ToString();
+            for (int k = 0; k < n.Length; k++)
+            {
+                var el = n[k] - '0';
+                if (el % 2 == 0)
+                    evens.Add(el);
+                else
+                    odds.Add(el);
+            }
+
+            odds.Sort();
+            evens.Sort();
+            var res = 0;
+            int i = evens.Count - 1, j = odds.Count - 1;
+            for (int k = 0; k < n.Length; k++)
+            {
+                var el = n[k] - '0';
+                if (el % 2 == 0)
+                {
+                    res = res * 10 + evens[i--];
+                }
+                else
+                    res = res * 10 + odds[j--];
+            }
+
+            return res;
+        }
+
         //azbzaz
         public static long SumScores(string s)
         {

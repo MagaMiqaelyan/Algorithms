@@ -25,7 +25,7 @@ namespace HeapStackQueue
             _heap = new List<T>();
             this.comparer = comparer;
         }
-
+        public List<T> GetElements => _heap;
         public int Count => _heap.Count;
 
         public bool IsEmpty => _heap.Count == 0;
