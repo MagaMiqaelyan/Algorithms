@@ -2,19 +2,65 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
+
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Leetcode
 {
+    public class MyCalendarTwo
+    {
+
+        private Dictionary<int, int> _calendar;
+        public MyCalendarTwo()
+        {
+            _calendar = new Dictionary<int, int>();
+        }
+
+        public bool Book(int start, int end)
+        {
+            var booked = 0;
+            if (_calendar.ContainsKey(start))
+                _calendar[start]++;
+            else
+                _calendar.Add(start, 1);
+
+            if (_calendar.ContainsKey(end))
+                _calendar[end]--;
+            else
+                _calendar.Add(end, -1);
+
+            foreach (var (time, count) in _calendar)
+            {
+                booked += count;
+                if (booked == 3)
+                {
+                    _calendar[start]--;
+                    _calendar[end]++;
+                    return false;
+                }
+
+            }
+            return true;
+        }
+    }
+
     public class File
     {
         public bool IsDir { get; set; }
         public string Content { get; set; }
         public List<File> Children { get; set; }
         public string Name { get; set; }
+
+        public File()
+        {
+
+        }
 
         public File(bool isDir, string name)
         {
@@ -268,6 +314,49 @@ namespace Leetcode
             return 0;
         }
     }
+
+    public class SnapshotArray
+    {
+
+        Dictionary<int, int[]> map;
+        int snap_id = 0;
+        int length = 0;
+        public SnapshotArray(int length)
+        {
+            map = new Dictionary<int, int[]>();
+            snap_id = 0;
+            this.length = length;
+        }
+
+        public void Set(int index, int val)
+        {
+            if (!map.ContainsKey(index))
+                map.Add(index, new int[length]);
+
+            map[index][snap_id] = val;
+
+        }
+
+        public int Snap()
+        {
+            return snap_id++;
+        }
+
+        public int Get(int index, int snap_id)
+        {
+            if (map.ContainsKey(index))
+                return map[index] == null ? 0 : map[index][snap_id];
+            return 0;
+        }
+    }
+
+    /**
+     * Your SnapshotArray object will be instantiated and called as such:
+     * SnapshotArray obj = new SnapshotArray(length);
+     * obj.Set(index,val);
+     * int param_2 = obj.Snap();
+     * int param_3 = obj.Get(index,snap_id);
+     */
     class Program
     {
         static void Main(string[] args)
@@ -446,12 +535,1575 @@ namespace Leetcode
             //UniqueLetterString("LEETCODE");
             //FirstMissingPositive(new int[] { 3, 4, -1, 1 });
             //SumScores("azbazbzaz");
-            #endregion
-
             //LargestInteger(247);
             //MaximumProduct(new int[] { 24, 5, 64, 53, 26, 38 }, 54);
             //MinimizeResult("99+99");
+            //MoveZeroes(new int[] { 0, 1, 0, 3, 12 });
+            //var n = new ListNode(1, new ListNode(2, new ListNode(4, new ListNode(5))));
+            //DeleteNode(n.next);
+            //RemoveDuplicates(new int[] { 0, 0, 1, 1, 1, 2, 2, 3, 3, 4 });
+            //DeleteDuplicates(new ListNode(1, new ListNode(1, new ListNode(1))));
+            //IsHappy(2);
+            //MaxSumTwoNoOverlap(new int[] { 0, 6, 5, 2, 2, 5, 1, 9, 4 }, 1, 2);
+            //FurthestBuilding(new[] { 4, 12, 2, 7, 3, 18, 20, 3, 19 }, 10, 2);
+            //Console.WriteLine(CanMeasureWater(3, 5, 4));
+
+            //Console.WriteLine(DateTime.Parse("October, 12 2022"));
+            //Console.WriteLine(DaysBetweenDates("2019-06-30", "2019-06-29"));
+
+            //FindRestaurant(new[] { "Shogun", "Tapioca Express", "Burger King", "KFC" }, new[] { "KFC", "Shogun", "Burger King" });
+            //NumSplits("aacaba");
+
+            //var treeNode = new TreeNode(-100, new TreeNode(-200, new TreeNode(-20), new TreeNode(-5)),
+            //    new TreeNode(-300, null, new TreeNode(-10, null, null)));
+            //MaxLevelSum(treeNode);
+
+            //CanFinish(2, new int[][] { new int[] { 1, 0 } });
+            //KnightDialer(2);
+            //FindMinHeightTrees(6, new int[][] 
+            //{
+            //    new int[] { 3, 0 },
+            //    new int[] { 3, 1 },
+            //    new int[] { 3, 2 }, 
+            //    new int[] { 3, 4 }, 
+            //    new int[] { 5, 4 }, 
+            //});
+
+            //ShipWithinDays(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, 5);
+            //ShortestPathBinaryMatrix(new int[][]
+            //{
+            //    new int[] { 0, 0, 0 },
+            //    new int[] { 1, 1, 0 },
+            //    new int[] { 1, 1, 1 },
+            //});
+            //var s = new string[] { "xbc", "pcxbcf", "xb", "cxbc", "pcxbc" };
+            //HorizontalFlip(new int[] { 1, 1, 1, 0 });
+            //Array.Sort(s, (string x, string y) => x.Length - y.Length);
+
+            //NumWaterBottles(15, 4);
+            //MinSteps("aba", "bab");
+            //GetMaximumGold(new int[][]
+            //{
+            //    new int[]{0,6,0},
+            //    new int[]{5,8,7},
+            //    new int[]{0,9,0},
+            //});
+
+            //ReorderLogFiles(new string[] { "a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo" });
+
+
+            //MinDominoRotations(new int[] { 2, 1, 2, 4, 2, 2 }, new int[] { 5, 2, 6, 2, 3, 2 });
+            //StrongPasswordChecker("aaa123"); 
+            //FirstBadVersion(5);
+            //var a = new SnapshotArray(1);
+            //a.Set(0, 15);
+            //a.Snap();
+            //a.Snap();
+            //a.Snap();
+            //a.Set(0, 2);
+            //a.Snap();
+            //a.Snap();
+            //var b = a.Get(0, 0);
+            //UniqueOccurrences(new int[] { 1, 2, 2, 1, 1, 3 });
+            // MinOperations("001011");
+            //RemoveDuplicates2(new int[] { 0 });
+            //Rotate(new int[] { 1, 2, 3, 4, 5, 6, 7 }, 3);
+
+
+            //NumSubmat(new int[][]
+            //{
+            //    new int[] { 1,0,1},
+            //    new int[] { 1,1,0},
+            //    new int[] { 1,1,0}
+            //});
+
+            //var myCalendarTwo = new MyCalendarTwo();
+            //myCalendarTwo.Book(10, 20); // return True, The event can be booked. 
+            //myCalendarTwo.Book(50, 60); // return True, The event can be booked. 
+            //myCalendarTwo.Book(10, 40); // return True, The event can be double booked. 
+            //myCalendarTwo.Book(5, 15);  // return False, The event cannot be booked, because it would result in a triple booking.
+            //myCalendarTwo.Book(5, 10); // return True, The event can be booked, as it does not use time 10 which is already double booked.
+            //myCalendarTwo.Book(25, 55);
+            //CombinationSum3(3, 9);
+            //var s = "2-5g-3-J";
+            // LicenseKeyFormatting(s, 2);
+            //LengthLongestPath("dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext");
+            //IsLongPressedName("saed","ssaaedd");
+            //GardenNoAdj(3, new int[][]
+            //{
+            //    new int[] { 1, 2},
+            //    new int[] { 2, 3 },
+            //    new int[] { 3, 1 }
+            //});
+            //FindReplaceString("abcd", new int[] { 0, 2 }, new string[] { "ab", "ec" }, new string[] { "eee", "ffff" });
+            //DuplicateZeros(new int[] { 1, 0, 2, 3, 0, 4, 5, 0 });
+            //WordsTyping(new string[] { "hello", "world" }, 2, 8);
+            #endregion
+
+            //MaxSubarrayLength(new int[] { 7, 6, 5, 4, 3, 2, 1, 6, 10, 11 });
+            //ValidateStackSequences(new int[] { 2, 1, 0 }, new int[] { 1,2,0 });
+            //NumEnclaves(new int[][]
+            //{
+            //    new int[] { 0,1,1,0 },
+            //    new int[] { 0,0,1,0 },
+            //    new int[] { 0,0,1,0 },
+            //    new int[] { 0,0,0,0 }
+            //});
+
+            //RemoveKdigits("1432219", 3);
+            SortArray(new int[] { 4, 2, 0, 3, 1 });
         }
+        public bool IsStrobogrammatic(string num)
+        {
+            var digits = new Dictionary<char, char>
+            {
+               {'0', '0'},
+               {'1', '1'},
+               {'6', '9'},
+               {'8', '8' },
+               {'9', '6'}
+            };
+
+            var rotated = new StringBuilder();
+            foreach (var n in num)
+            {
+                if (!digits.ContainsKey(n)) return false;
+                rotated.Append(digits[n]);
+            }
+            return rotated.ToString().Equals(num);
+        }
+
+        // 2 4 1 3 0   4 2 0 3 1
+        // 3 4 1 2 0   4 2 3 0 1
+        // 0 4 1 2 3   0 2 3 4 1
+        // 4 0 1 2 3   1 2 3 4 0
+        // 1 4 2 3 0
+        // 4 1 2 3 0
+        // 0 1 2 3 4
+        public static int SortArray(int[] nums)
+        {
+            var n = nums.Length;
+            var indices = new int[n];
+            for (int i = 0; i < nums.Length; i++)
+                indices[nums[i]] = i;
+            var swapsZeroIndexed = CountSwaps(indices, 0);
+            for (int i = 0; i < nums.Length; i++)
+                indices[nums[i]] = i;
+            var swapsOneIndexed = CountSwaps(indices, 1);
+            return Math.Min(swapsOneIndexed, swapsZeroIndexed);
+        }
+        private static int CountSwaps(int[] indices, int start)
+        {
+            var count = 0;
+            var nextIndex = 1;
+            var currentIndex = 0;
+
+            while (nextIndex < indices.Length)
+            {
+                if (indices[0] == (1 - start) * (indices.Length - 1))
+                {
+                    while (indices[nextIndex] == nextIndex + (start - 1))
+                    {
+                        if (++nextIndex == indices.Length) return count;
+                    }
+                    currentIndex = nextIndex;
+                }
+                else
+                {
+                    currentIndex = indices[0] + 1 - start;
+                }
+
+                var temp = indices[0];
+                indices[0] = indices[currentIndex];
+                indices[currentIndex] = temp;
+                count++;
+            }
+            return count;
+        }
+        public int[][] MinScore(int[][] grid)
+        {
+            var rows = grid.Length;
+            var cols = grid[0].Length;
+
+            var pq = new PriorityQueue<int[], int>();
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    pq.Enqueue(new int[] { i, j }, grid[i][j]);
+                }
+            }
+
+            var maxCols = new int[cols];
+            var maxRows = new int[rows];
+            var result = new int[rows][];
+            for (int i = 0; i < rows; i++)
+                result[i] = new int[cols];
+
+            while (pq.Count > 0)
+            {
+                var item = pq.Dequeue();
+                var x = item[0];
+                var y = item[1];
+                var max = Math.Max(maxRows[x], maxCols[y]) + 1;
+                result[x][y] = max;
+                maxRows[x] = max;
+                maxCols[y] = max;
+            }
+            return result;
+        }
+
+        public static string RemoveKdigits(string num, int k)
+        {
+            var stack = new Stack<char>();
+
+            foreach (var n in num.ToCharArray())
+            {
+                while (stack.Count() > 0 && k > 0 && stack.Peek() > n)
+                {
+                    stack.Pop();
+                    k--;
+                }
+                stack.Push(n);
+
+                if (stack.Count() == 1 && n == '0')
+                    stack.Pop();
+            }
+
+            while (stack.Count() > 0 && k > 0)
+            {
+                stack.Pop();
+                k--;
+            }
+
+            var res = new StringBuilder();
+            while (stack.Count() > 0)
+            {
+                res.Append(stack.Pop());
+            }
+            if (res.Length == 0) return "0";
+            return string.Join("", res.ToString().ToCharArray().Reverse());
+
+        }
+
+        public static int NumEnclaves(int[][] grid)
+        {
+            for (int i = 0; i < grid.Length; i++)
+            {
+                for (int j = 0; j < grid[0].Length; j++)
+                {
+                    if (i == 0 || j == 0 || i == grid.Length - 1 || j == grid[0].Length - 1)
+                        DFS(grid, i, j);
+                }
+            }
+            var result = 0;
+
+            for (int i = 0; i < grid.Length; i++)
+            {
+                for (int j = 0; j < grid[0].Length; j++)
+                {
+                    if (grid[i][j] == 1) result++;
+                }
+            }
+            return result;
+        }
+
+        private static void DFS(int[][] grid, int i, int j)
+        {
+            if (i >= grid.Length || j >= grid[0].Length || i < 0 || j < 0 || grid[i][j] == 0)
+                return;
+
+            grid[i][j] = 0;
+            DFS(grid, i + 1, j);
+            DFS(grid, i - 1, j);
+            DFS(grid, i, j + 1);
+            DFS(grid, i, j - 1);
+        }
+
+        public static bool IsThereAPath(int[][] grid)
+        {
+            var n = grid.Length;
+            var m = grid[0].Length;
+            if ((n + m - 1) % 2 != 0) return false;
+            return Solve(grid, 0, 0, 0);
+        }
+
+        private static bool Solve(int[][] grid, int i, int j, int sum)
+        {
+            if (i >= grid.Length || j >= grid[0].Length) return false;
+            sum += grid[i][j] == 1 ? 1 : -1;
+            if (i == grid.Length - 1 && j == grid[0].Length - 1) return sum == 0;
+            return Solve(grid, i + 1, j, sum) || Solve(grid, i, j + 1, sum);
+        }
+
+        public static bool ValidateStackSequences(int[] pushed, int[] popped)
+        {
+            var i = 0;
+            var j = 0;
+            var stack = new Stack<int>();
+            while (i < pushed.Length && j < popped.Length)
+            {
+                while (stack.Count() > 0 && stack.Peek() == popped[j])
+                {
+                    j++;
+                    stack.Pop();
+                }
+
+                stack.Push(pushed[i]);
+                i++;
+            }
+
+            while (j < popped.Length)
+            {
+                if (stack.Peek() == popped[j])
+                {
+                    stack.Pop();
+                }
+                j++;
+            }
+            return stack.Count() == 0;
+        }
+
+        public static int MaxSubarrayLength(int[] nums)
+        {
+            Stack<int> stack = new Stack<int>();
+            int n = nums.Length;
+
+            for (int i = n - 1; i >= 0; i--)
+            {
+                if (stack.Count() == 0 || nums[i] < nums[stack.Peek()])
+                {
+                    stack.Push(i);
+                }
+            }
+
+            int r = 0;
+            int m = int.MinValue;
+
+            for (int i = 0; i < n; i++)
+            {
+                while (stack.Count() > 0 && stack.Peek() <= i)
+                {
+                    stack.Pop();
+                }
+
+                if (nums[i] > m)
+                {
+                    m = nums[i];
+
+                    while (stack.Count() > 0 && nums[stack.Peek()] < m)
+                    {
+                        r = Math.Max(r, stack.Peek() - i + 1);
+                        stack.Pop();
+                    }
+                }
+            }
+
+            return r;
+        }
+
+
+        public static int WordsTyping(string[] sentence, int rows, int cols)
+        {
+            var str = new StringBuilder();
+            foreach (var s in sentence)
+                str.Append(s).Append(' ');
+
+            var cursor = 0;
+            var n = str.Length;
+            for (int i = 0; i < rows; i++)
+            {
+                cursor += cols;
+                while (cursor % n >= 0 && str[cursor % n] != ' ')
+                    cursor--;
+
+                cursor++;
+            }
+            return cursor / n;
+        }
+
+        public static void DuplicateZeros(int[] arr)
+        {
+            for (int i = 0; i < arr.Length - 1; i++)
+            {
+                if (arr[i] != 0) continue;
+                for (int j = arr.Length - 2; j > i; j--)
+                {
+                    arr[j + 1] = arr[j];
+                }
+                arr[i + 1] = 0;
+                i++;
+            }
+        }
+
+        //        "vmokgggqzp"
+        //[3,5,1]
+        //        ["kg","ggq","mo"]
+        //        ["s","so","bfr"]
+
+        public static string FindReplaceString(string s, int[] indices, string[] sources, string[] targets)
+        {
+            var ans = new StringBuilder();
+            var j = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (!indices.Contains(i))
+                {
+                    ans.Append(s[i]);
+                    continue;
+                }
+
+                var len = sources[j].Length;
+                if (len > 0)
+                {
+                    var sub = s.Substring(indices[j], len);
+                    if (sub == sources[j])
+                    {
+                        ans.Append(targets[j]);
+                        i += sources[j].Length - 1;
+                        j++;
+                    }
+                    else
+                        ans.Append(s[i]);
+                }
+            }
+            return ans.ToString();
+        }
+
+        public static int[] GardenNoAdj(int n, int[][] paths)
+        {
+            var map = new Dictionary<int, HashSet<int>>();
+
+            foreach (var node in paths)
+            {
+                if (!map.ContainsKey(node[0]))
+                    map.Add(node[0], new HashSet<int>());
+                map[node[0]].Add(node[1]);
+            }
+
+            var result = new int[n];
+            foreach (var (x1, y1) in map)
+            {
+                for (int i = 1; i <= 3; i++)
+                {
+                    if (y1.Contains(i) || (x1 >= 2 && result[x1 - 2] == i)) continue;
+                    result[x1 - 1] = i;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public static bool IsLongPressedName(string name, string typed)
+        {
+            var target = 0;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (target >= typed.Length || name[i] != typed[target]) return false;
+                var temp = 1;
+                while (i < name.Length - 1 && name[i] == name[i + 1])
+                {
+                    temp++;
+                    i++;
+                }
+
+                while (target < typed.Length && typed[target] == name[i])
+                {
+                    target++;
+                    temp--;
+                }
+
+                if (temp >= 1) return false;
+            }
+            return target == typed.Length;
+        }
+
+        public static int LengthLongestPath(string input)
+        {
+            var tokens = input.Split("\n");
+            var result = 0;
+            var curLen = 0;
+            var stack = new Stack<int>();
+
+            foreach (var t in tokens)
+            {
+                var level = t.LastIndexOf('\t') + 1;
+
+                while (stack.Count() > level)
+                    curLen -= stack.Pop();
+
+                var l = t.Replace("\t", "").Length + 1;
+                curLen += l;
+
+                if (t.Contains('.'))
+                {
+                    result = Math.Max(curLen - 1, result);
+                }
+                stack.Push(l);
+            }
+
+            return result;
+
+        }
+
+        public static string LicenseKeyFormatting(string s, int k)
+        {
+            s = s.Replace("-", "");
+            var i = 0;
+            var n = s.Length;
+            var result = "";
+            // 25g3j 5
+            while (i < n)
+            {
+                if (n - k - i < 0)
+                    result = s.Substring(0, n - i) + result;
+                else
+                    result = s.Substring(n - k - i, k).ToUpper() + result;
+                i += k;
+                if (i < n) result = '-' + result;
+            }
+            return result;
+        }
+
+        public static IList<IList<int>> CombinationSum3(int k, int n)
+        {
+            var numbers = new int[9];
+            sum3 = new List<IList<int>>();
+            for (int i = 1; i <= 9; i++)
+                numbers[i - 1] = i;
+
+            Helper(numbers, 1, 0, k, n, new List<int>());
+            return sum3;
+        }
+
+        private static IList<IList<int>> sum3;
+        public static void Helper(int[] numbers, int start, int sum, int k, int n, List<int> current)
+        {
+            if (sum == n && current.Count == k)
+            {
+                sum3.Add(new List<int>(current));
+                return;
+            }
+            if (sum >= n || current.Count >= k) return;
+
+            for (int i = start; i <= 9; i++)
+            {
+                current.Add(numbers[i - 1]);
+                Helper(numbers, i + 1, sum + numbers[i - 1], k, n, current);
+                current.RemoveAt(current.Count - 1);
+            }
+        }
+
+        public static int NumSubmat(int[][] mat)
+        {
+            var m = mat.Length;
+            var n = mat[0].Length;
+            var helper = new int[n];
+            var res = 0;
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    helper[j] = (mat[i][j] == 0 ? 0 : helper[j] + 1);
+                }
+                res += Helper(helper);
+            }
+            return res;
+        }
+
+        public static int Helper(int[] arr)
+        {
+            var stack = new Stack<int>();
+            var result = new int[arr.Length];
+            var i = 0;
+            while (i < arr.Length)
+            {
+                while (stack.Count > 0 && arr[stack.Peek()] >= arr[i])
+                    stack.Pop();
+
+                if (stack.Count > 0)
+                {
+                    var preIndex = stack.Peek();
+                    result[i] = result[preIndex] + arr[i] * (i - preIndex);
+                }
+                else
+                {
+                    result[i] = arr[i] * (i + 1);
+                }
+                stack.Push(i);
+                i++;
+            }
+            return result.Sum();
+        }
+
+        public static void Rotate(int[] nums, int k)
+        {
+            var result = new int[k];
+            var n = nums.Length;
+            for (int i = n - k, j = 0; i < n; i++, j++)
+            {
+                result[j] = nums[i];
+            }
+
+            for (int i = 0; i < n - k; i++)
+            {
+                nums[n - i - 1] = nums[n - k - i - 1];
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                nums[i] = result[i];
+            }
+        }
+
+        public static int RemoveDuplicates2(int[] nums)
+        {
+            if (nums.Length <= 2) return 2;
+
+            var count = 2;
+            for (int i = 2; i < nums.Length; i++)
+            {
+                if (nums[i] != nums[count - 2])
+                {
+                    nums[count] = nums[i];
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public static bool UniqueOccurrences(int[] arr)
+        {
+            var map = new Dictionary<int, int>();
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (map.ContainsKey(arr[i]))
+                {
+                    map[arr[i]]++;
+                }
+                else
+                {
+                    map[arr[i]] = 1;
+                }
+            }
+            var values = map.Select(x => x.Value).Distinct();
+            return values.Count() == map.Count();
+        }
+
+
+        public static int FirstBadVersion(int n)
+        {
+            var start = 1;
+            var end = n;
+            while (start < end)
+            {
+                var mid = start + (end - start) / 2;
+                var isBadMid = IsBadVersion(mid);
+                var isBadMidLeft = IsBadVersion(mid - 1);
+                if (!isBadMidLeft && isBadMid)
+                    return mid;
+                if (!isBadMidLeft && !isBadMid)
+                    start = mid + 1;
+                else
+                    end = mid - 1;
+
+            }
+            return start;
+        }
+
+        private static bool IsBadVersion(int n)
+        {
+            if (n == 5) return true;
+            if (n == 4) return true;
+            if (n == 3) return false;
+            return false;
+        }
+
+        public static int StrongPasswordChecker(string password)
+        {
+            int missingCharacters = GetMissingCharacters(password);
+            int missingTypes = GetMissingTypes(password);
+            int repeatingChars = GetRepeatingCharacters(password);
+
+            if (password.Length < 6)
+            {
+                return Math.Max(6 - password.Length, Math.Max(missingTypes, repeatingChars));
+            }
+
+            int totalSteps = 0;
+            if (password.Length > 20)
+            {
+                int deleteCount = password.Length - 20;
+                totalSteps += deleteCount;
+                repeatingChars = Math.Max(0, repeatingChars - 3 * deleteCount); // Corrected this line
+                int index = 0;
+                while (deleteCount > 0 && index < password.Length)
+                {
+                    if (index + 2 < password.Length && password[index] == password[index + 1] && password[index] == password[index + 2])
+                    {
+                        password = password.Remove(index + 2, 1);
+                        deleteCount--;
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+            }
+
+            totalSteps += Math.Max(missingCharacters, missingTypes);
+            totalSteps += repeatingChars;
+
+            return totalSteps;
+        }
+
+        private static int GetMissingCharacters(string password)
+        {
+            int missingChars = 0;
+            if (!ContainsLowercase(password)) missingChars++;
+            if (!ContainsUppercase(password)) missingChars++;
+            if (!ContainsDigit(password)) missingChars++;
+            return missingChars;
+        }
+
+        private static int GetMissingTypes(string password)
+        {
+            int missingTypes = 0;
+            if (!ContainsLowercase(password)) missingTypes++;
+            if (!ContainsUppercase(password)) missingTypes++;
+            if (!ContainsDigit(password)) missingTypes++;
+            return missingTypes;
+        }
+
+        private static int GetRepeatingCharacters(string password)
+        {
+            int repeatingChars = 0;
+            for (int i = 0; i < password.Length; i++)
+            {
+                int repeatLength = 1;
+                while (i + 1 < password.Length && password[i] == password[i + 1])
+                {
+                    repeatLength++;
+                    i++;
+                }
+                repeatingChars += repeatLength / 3;
+            }
+            return repeatingChars;
+        }
+
+        private static bool ContainsLowercase(string password)
+        {
+            return password.Any(char.IsLower);
+        }
+
+        private static bool ContainsUppercase(string password)
+        {
+            return password.Any(char.IsUpper);
+        }
+
+        private static bool ContainsDigit(string password)
+        {
+            return password.Any(char.IsDigit);
+        }
+
+        public static int MinDominoRotations(int[] tops, int[] bottoms)
+        {
+            var topCounts = new int[7];
+            var bottomCounts = new int[7];
+            var same = new int[7];
+            var n = tops.Length;
+            for (int i = 0; i < n; i++)
+            {
+                topCounts[tops[i]]++;
+                bottomCounts[bottoms[i]]++;
+                if (tops[i] == bottoms[i])
+                    same[tops[i]]++;
+            }
+
+            for (int i = 1; i < 7; i++)
+            {
+                if (topCounts[i] + bottomCounts[i] - same[i] == n)
+                    return n - Math.Max(topCounts[i], bottomCounts[i]);
+            }
+
+            return -1;
+        }
+
+        public static string[] ReorderLogFiles(string[] logs)
+        {
+            var mapLetterLogs = new Dictionary<string, string>();
+            var digitlogs = new List<string>();
+
+            foreach (var log in logs)
+            {
+                var split = log.Split(' ');
+                if (int.TryParse(split[1], out var res))
+                    digitlogs.Add(log);
+                else
+                {
+                    var value = string.Join(' ', split.Skip(1));
+                    mapLetterLogs.Add(log, value);
+                }
+            }
+
+            var letterlogs = mapLetterLogs.OrderBy(x => x.Value).ThenBy(x => x.Key);
+            var answer = new List<string>();
+
+            foreach (var log in letterlogs)
+            {
+                answer.Add(log.Key);
+            }
+
+            foreach (var log in digitlogs)
+            {
+                answer.Add(log);
+            }
+            return answer.ToArray();
+        }
+
+
+        static int maxGold = 0;
+        static List<int[]> directions1 = new List<int[]>
+                {
+                   new int[] { 1, 0},
+                   new int[]  { 0, 1},
+                   new int[]  { -1, 0},
+                    new int[] { 0, -1},
+                };
+        public static int GetMaximumGold(int[][] grid)
+        {
+            maxGold = 0;
+            for (int i = 0; i < grid.Length; i++)
+                for (int j = 0; j < grid[0].Length; j++)
+                {
+                    maxGold = Math.Max(maxGold, GetGold(grid, new byte[grid.Length, grid[0].Length], i, j));
+                }
+            return maxGold;
+        }
+
+        public static int GetGold(int[][] grid, byte[,] visited, int i, int j)
+        {
+            if (i < 0 || j < 0 || i >= grid.Length || j >= grid[0].Length || visited[i, j] == 1 || grid[i][j] == 0)
+                return 0;
+
+            var maxPath = 0;
+            visited[i, j] = 1;
+            foreach (var dir in directions1)
+            {
+                maxPath = Math.Max(maxPath, GetGold(grid, visited, i + dir[0], j + dir[1]));
+            }
+            visited[i, j] = 0;
+            return maxPath + grid[i][j];
+        }
+
+        public int MaxSum(int[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            int maxSum = int.MinValue;
+
+            for (int colIndex = 0; colIndex < cols; colIndex++)
+            {
+                int sum = matrix[0, colIndex] - colIndex;
+                int rowIndex = 1;
+                int currColIndex = colIndex;
+
+                while (rowIndex < rows && currColIndex < cols)
+                {
+                    sum += matrix[rowIndex, currColIndex] - currColIndex;
+                    rowIndex++;
+                    currColIndex++;
+                }
+
+                maxSum = Math.Max(maxSum, sum);
+            }
+
+            return maxSum;
+        }
+
+
+        public void HorizontalFlip(int width, byte[] image)
+        {
+            int height = image.Length / width;
+
+            for (int y = 0; y < height; y++)
+            {
+                int rowStart = y * width;
+                int rowEnd = rowStart + width - 1;
+
+                while (rowStart < rowEnd)
+                {
+                    image[rowStart] ^= image[rowEnd];
+                    image[rowEnd] ^= image[rowStart];
+                    image[rowStart] ^= image[rowEnd];
+
+                    rowStart++;
+                    rowEnd--;
+                }
+            }
+        }
+
+        public static int MinSteps(string s, string t)
+        {
+            var firstArr = new char[26];
+            var secondArr = new char[26];
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                firstArr[s[i] - 'a']++;
+                secondArr[t[i] - 'a']++;
+            }
+
+            var minChars = 0;
+            for (int i = 0; i < 26; i++)
+            {
+                minChars += (Math.Abs(firstArr[i] - secondArr[i]));
+            }
+            return minChars / 2;
+        }
+
+        public static int NumWaterBottles(int numBottles, int numExchange)
+        {
+            var result = numBottles;
+            while (numBottles >= numExchange)
+            {
+                result += (numBottles / numExchange);
+                numBottles = numBottles / numExchange + (numBottles % numExchange);
+            }
+            return result;
+        }
+
+
+        public static int ShortestPathBinaryMatrix(int[][] grid)
+        {
+            return BFS(grid);
+            //var res = DFS(0, 0, grid);
+            //return res == int.MaxValue ? -1 : res;
+        }
+
+
+        public static int BFS(int[][] grid)
+        {
+            if (grid[0][0] == 1) return -1;
+            Queue<(int row, int col, int val)> queue = new Queue<(int, int, int)>();
+            queue.Enqueue((0, 0, 1));
+            var cols = grid[0].Length;
+            var rows = grid.Length;
+
+            var min = int.MaxValue;
+            grid[0][0] = 1;
+
+            while (queue.Count() > 0)
+            {
+                var current = queue.Dequeue();
+                if (current.row == rows - 1 && current.col == cols - 1)
+                    return current.val;
+
+                foreach (var dir in directions)
+                {
+                    var r = current.row + dir[0];
+                    var c = current.col + dir[1];
+
+                    if (r < 0 || c < 0 || r >= rows || c >= cols || grid[r][c] == 1)
+                        continue;
+                    grid[r][c] = 1;
+                    queue.Enqueue((r, c, current.val + 1));
+                }
+
+            }
+
+            return min == int.MaxValue ? -1 : min;
+
+        }
+
+        static int[][] directions = new int[][]
+                {
+                   new int[]{ -1, 0},
+                   new int[]{ 0, -1},
+                   new int[]{ 1, 0},
+                   new int[]{ 0, 1},
+                   new int[]{ 1, 1},
+                   new int[]{ -1, -1},
+                   new int[]{ 1, -1},
+                   new int[]{ -1, 1},
+                };
+        public static int DFS(int row, int col, int[][] grid)
+        {
+            if (row < 0 || col < 0 || row >= grid.Length || col >= grid[0].Length ||
+               grid[row][col] == 1)
+                return int.MaxValue;
+
+            if (row == (grid.Length - 1) && col == (grid[0].Length - 1)) return 1;
+
+            grid[row][col] = 1;
+
+            var min = int.MaxValue;
+            foreach (var dir in directions)
+                min = Math.Min(min, DFS(row + dir[0], col + dir[1], grid));
+
+            grid[row][col] = 0;
+            return min != int.MaxValue ? min + 1 : int.MaxValue;
+        }
+
+        public static int ShipWithinDays(int[] weights, int days)
+        {
+            var minCapacity = weights.Max();
+            var maxCapacity = weights.Sum();
+
+            var currCap = -1;
+            while (minCapacity <= maxCapacity)
+            {
+                var mid = minCapacity + (maxCapacity - minCapacity) / 2;
+                if (CanShip(mid, weights, days))
+                {
+                    maxCapacity = mid - 1;
+                    currCap = mid;
+                }
+                else
+                {
+                    minCapacity = mid + 1;
+                }
+            }
+            return currCap;
+        }
+
+        public static bool CanShip(int capacity, int[] weights, int days)
+        {
+            int currCap = capacity;
+
+            foreach (int weight in weights)
+            {
+                if (currCap - weight >= 0)
+                {
+                    currCap -= weight;
+                }
+                else
+                {
+                    days--;
+                    currCap = capacity - weight;
+                }
+            }
+            return days > 0;
+        }
+
+        public int[] SortByBits(int[] arr)
+        {
+            List<(int num, int count)> map = new List<(int, int)>();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                var count = CountsOnes(arr[i]);
+                map.Add((arr[i], count));
+            }
+
+            return map.OrderBy(x => x.count).Select(x => x.num).ToArray();
+        }
+
+        public int CountsOnes(int number)
+        {
+            var countOnes = 0;
+            while (number != 0)
+            {
+                if ((number & 1) == 1)
+                    countOnes++;
+
+                number >>= 1;
+            }
+            return countOnes;
+        }
+
+        public static IList<int> FindMinHeightTrees(int n, int[][] edges)
+        {
+            var graph = CreateGraph(edges);
+
+            var leaves = new Queue<int>();
+            foreach (var node in graph)
+            {
+                if (node.Value.Count() <= 1)
+                    leaves.Enqueue(node.Key);
+            }
+
+            while (n > 2)
+            {
+                n -= leaves.Count();
+                for (int i = leaves.Count(); i > 0; i--)
+                {
+                    var leaf = leaves.Dequeue();
+                    foreach (var node in graph[leaf])
+                    {
+                        graph[node].Remove(leaf);
+                        if (graph[node].Count() == 1)
+                            leaves.Enqueue(node);
+                    }
+                }
+            }
+            return leaves.ToList();
+        }
+
+        public static Dictionary<int, List<int>> CreateGraph(int[][] edges)
+        {
+            var adjacencyList = new Dictionary<int, List<int>>();
+
+            for (int i = 0; i < edges.Length; i++)
+            {
+                if (adjacencyList.ContainsKey(edges[i][0]))
+                    adjacencyList[edges[i][0]].Add(edges[i][1]);
+                else
+                    adjacencyList[edges[i][0]] = new List<int> { edges[i][1] };
+
+                if (adjacencyList.ContainsKey(edges[i][1]))
+                    adjacencyList[edges[i][1]].Add(edges[i][0]);
+                else
+                    adjacencyList[edges[i][1]] = new List<int> { edges[i][0] };
+            }
+            return adjacencyList;
+        }
+
+
+        static int modulo = (int)Math.Pow(10, 9) + 7;
+        public static int KnightDialer(int n)
+        {
+            long modulo = 1000000007;
+            long output = 0;
+            long[,,] field = new long[4, 3, n + 1];
+            for (int r = 0; r < 4; r++)
+            {
+                for (int c = 0; c < 3; c++)
+                    output = (output + Jump(r, c, n, field)) % modulo;
+            }
+
+            return (int)output;
+        }
+
+
+        public static long Jump(int row, int col, int count, long[,,] field)
+        {
+            if (row >= 4 || row < 0 || col >= 3 || col < 0) return 0;
+            if ((row == 3 && col == 2) || (row == 3 && col == 0)) return 0;
+            if (count == 1) return 1;
+            if (field[row, col, count] > 0) return field[row, col, count];
+            field[row, col, count] =
+            Jump(row - 2, col - 1, count - 1, field) % modulo +
+            Jump(row - 1, col - 2, count - 1, field) % modulo +
+            Jump(row - 2, col + 1, count - 1, field) % modulo +
+            Jump(row - 1, col + 2, count - 1, field) % modulo +
+            Jump(row + 1, col - 2, count - 1, field) % modulo +
+            Jump(row + 2, col - 1, count - 1, field) % modulo +
+            Jump(row + 2, col + 1, count - 1, field) % modulo +
+            Jump(row + 1, col + 2, count - 1, field) % modulo;
+
+            return field[row, col, count];
+        }
+
+
+        public static bool CanFinish(int numCourses, int[][] prerequisites)
+        {
+            List<int>[] adjencyList = new List<int>[numCourses];
+            Queue<int> queue = new Queue<int>();
+            int[] indegree = new int[numCourses];
+
+            for (int i = 0; i < numCourses; i++)
+                adjencyList[i] = new List<int>();
+
+            for (int i = 0; i < prerequisites.Length; i++)
+                adjencyList[prerequisites[i][1]].Add(prerequisites[i][0]);
+
+            for (int i = 0; i < numCourses; i++)
+                foreach (int j in adjencyList[i])
+                    indegree[j]++;
+
+            for (int i = 0; i < indegree.Length; i++)
+                if (indegree[i] == 0)
+                    queue.Enqueue(i);
+
+            int nodeCount = queue.Count;
+            while (queue.Count != 0)
+            {
+                int temp = queue.Dequeue();
+                foreach (int i in adjencyList[temp])
+                {
+                    if (--indegree[i] == 0)
+                    {
+                        queue.Enqueue(i);
+                        nodeCount++;
+                    }
+                }
+            }
+
+            return nodeCount == numCourses;
+        }
+
+        public int ShortestPath(int[][] grid, int k)
+        {
+            var rows = grid.Length;
+            var cols = grid[0].Length;
+
+            if (k >= rows - 1 + cols - 1)
+                return rows + cols - 2;
+
+            Queue<(int row, int col, int rem, int dist)> queue = new Queue<(int, int, int, int)>();
+            HashSet<(int row, int col, int rem)> map = new HashSet<(int row, int col, int rem)>();
+
+            queue.Enqueue((0, 0, k, 0));
+
+            var directions = new List<Point> { new Point(1, 0), new Point(-1, 0), new Point(0, 1), new Point(0, -1) };
+
+            while (queue.Count() > 0)
+            {
+                var currentCell = queue.Dequeue();
+
+                if (currentCell.row == rows - 1 && currentCell.col == cols - 1) return currentCell.dist;
+                foreach (var direction in directions)
+                {
+                    var newCell = new Point(currentCell.row + direction.X, currentCell.col + direction.Y);
+                    if (newCell.X >= 0 && newCell.X < rows && newCell.Y >= 0 && newCell.Y < cols)
+                    {
+                        var newRemoved = currentCell.rem - grid[newCell.X][newCell.Y];
+                        if (newRemoved >= 0 && !map.Contains((newCell.X, newCell.Y, newRemoved)))
+                        {
+                            map.Add((newCell.X, newCell.Y, newRemoved));
+                            queue.Enqueue(((newCell.X, newCell.Y, newRemoved, currentCell.dist + 1)));
+                        }
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+
+        public static int MaxLevelSum(TreeNode root)
+        {
+            if (root.left == null && root.right == null) return 1;
+            var maxLevel = 1;
+            var currentLevel = 1;
+            var maxSum = root.val;
+            var queue = new Queue<TreeNode>();
+            queue.Enqueue(root);
+
+
+            while (queue.Count() > 0)
+            {
+                var size = queue.Count();
+                var currentSum = 0;
+                for (int i = 0; i < size; i++)
+                {
+                    var current = queue.Dequeue();
+                    if (current.left != null)
+                    {
+                        queue.Enqueue(current.left);
+                        currentSum += current.left.val;
+                    }
+                    if (current.right != null)
+                    {
+                        queue.Enqueue(current.right);
+                        currentSum += current.right.val;
+                    }
+
+                }
+                if (queue.Count() == 0) break;
+                currentLevel++;
+                if (maxSum < currentSum)
+                {
+                    maxSum = currentSum;
+                    maxLevel = currentLevel;
+                }
+
+
+            }
+
+            return maxLevel;
+
+        }
+
+
+        public static int NumSplits(string s)
+        {
+            var good = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (IsSame(s.Substring(0, i + 1), s.Substring(i + 1, s.Length - i - 1)))
+                    good++;
+            }
+            return good;
+        }
+
+        public static bool IsSame(string s1, string s2)
+        {
+            var letters1 = new char[26];
+            var letters2 = new char[26];
+
+            foreach (var s in s1)
+            {
+                letters1[s - 'a']++;
+            }
+
+            foreach (var s in s2)
+            {
+                letters2[s - 'a']++;
+            }
+
+            var l1 = 0;
+            var l2 = 0;
+            for (int i = 0; i < 26; i++)
+            {
+                if (letters1[i] > 0) l1++;
+                if (letters2[i] > 0) l2++;
+            }
+            return l1 == l2;
+        }
+
+        public static string[] FindRestaurant(string[] list1, string[] list2)
+        {
+            var commons = new List<string>();
+
+            var set1 = new Dictionary<string, int>();
+
+
+            for (int i = 0; i < list1.Count(); i++)
+                set1.Add(list1[i], i);
+
+            var minIndex = int.MaxValue;
+            for (int i = 0; i < list2.Count(); i++)
+            {
+                var s2 = list2[i];
+                if (set1.ContainsKey(s2))
+                {
+                    var j = set1[s2];
+                    if (minIndex == i + j)
+                    {
+                        commons.Add(s2);
+                    }
+                    else if (minIndex > i + j)
+                    {
+                        minIndex = i + j;
+                        commons.Clear();
+                        commons.Add(s2);
+                    }
+                }
+            }
+
+            return commons.ToArray();
+        }
+
+        public int MinScoreTriangulation(int[] values)
+        {
+            int[,] map = new int[values.Length, values.Length];
+            int ans = MinScoreTriangulationRec(values, 1, values.Length - 1, map);
+
+            return ans;
+        }
+
+        private int MinScoreTriangulationRec(int[] arr, int i, int j, int[,] map)
+        {
+            if (i >= j) return 0;
+            if (map[i, j] != 0) return map[i, j];
+
+            int maxn = int.MaxValue;
+            for (int k = i; k < j; k++)
+            {
+                int temp = MinScoreTriangulationRec(arr, i, k, map) + MinScoreTriangulationRec(arr, k + 1, j, map) + arr[i - 1] * arr[k] * arr[j];
+
+                if (temp < maxn)
+                {
+                    maxn = temp;
+                }
+            }
+            map[i, j] = maxn;
+            return maxn;
+        }
+
+
+        public static int DaysBetweenDates(string date1, string date2)
+        {
+            var s1 = date1.Split('-').Select(x => int.Parse(x)).ToArray();
+            var s2 = date2.Split('-').Select(x => int.Parse(x)).ToArray();
+            var d1 = new DateTime(s1[0], s1[1], s1[2]);
+            var d2 = new DateTime(s2[0], s2[1], s2[2]);
+            return Math.Abs(d1.Subtract(d1).Days);
+        }
+
+        public static bool CanMeasureWater(int jug1Capacity, int jug2Capacity, int targetCapacity)
+        {
+            if (jug1Capacity + jug2Capacity < targetCapacity) return false;
+            var gcd = GCD(Math.Max(jug1Capacity, jug2Capacity), Math.Min(jug1Capacity, jug2Capacity));
+            return targetCapacity % gcd == 0;
+        }
+
+
+        public static int GCD(int a, int b)
+        {
+            if (a % b == 0) return b;
+            return GCD(b, a % b);
+        }
+
+        public static int FurthestBuilding(int[] heights, int bricks, int ladders)
+        {
+            var queue = new PriorityQueue<int, int>();
+            var n = heights.Count() - 1;
+            for (int i = 0; i < n; i++)
+            {
+                var climb = heights[i + 1] - heights[i];
+                if (climb <= 0) continue;
+
+                queue.Enqueue(climb, climb);
+
+                if (ladders >= queue.Count) continue;
+
+                var min = queue.Dequeue();
+                bricks -= min;
+                if (bricks < 0) return i;
+            }
+
+            return n;
+        }
+
+        public static int MaxSumTwoNoOverlap(int[] A, int L, int M)
+        {
+            return Math.Max(MaxSum(A, L, M), MaxSum(A, M, L));
+        }
+
+        private static int MaxSum(int[] A, int L, int M)
+        {
+            int sumL = 0, sumM = 0;
+            for (int i = 0; i < L + M; i++)
+            {
+                if (i < L)
+                {
+                    sumL += A[i];
+                }
+                else
+                {
+                    sumM += A[i];
+                }
+            }
+            int ans = sumM + sumL;
+            int maxL = sumL;
+            for (int i = L + M; i < A.Length; i++)
+            {
+                sumM += A[i] - A[i - M];
+                sumL += A[i - M] - A[i - L - M];
+                maxL = Math.Max(maxL, sumL);
+                ans = Math.Max(ans, maxL + sumM);
+            }
+
+            return ans;
+        }
+
+        public static bool IsHappy(int n)
+        {
+            if (n == 1) return true;
+
+            while (n > 0)
+            {
+                n = Squares(n);
+                if (n == 1)
+                    return true;
+            }
+            return false;
+        }
+
+        public static int Squares(int a)
+        {
+            if (a >= 1 && a <= 9)
+                return a * a;
+            var count = 0d;
+            while (a > 0)
+            {
+                count += Math.Pow((a % 10), 2);
+                a = a / 10;
+            }
+            return (int)count;
+        }
+
+        public static ListNode DeleteDuplicates(ListNode head)
+        {
+            if (head == null) return null;
+            ListNode node = new ListNode(head.val);
+            ListNode temp = node;
+            while (head != null && head.next != null)
+            {
+                if (head.val != head.next.val)
+                {
+                    temp.next = new ListNode(head.next.val);
+                    temp = temp.next;
+                }
+                head = head.next;
+            }
+            return node;
+        }
+
+        public static int RemoveDuplicates(int[] nums)
+        {
+            var current = 0;
+            for (int i = 1; i < nums.Length; i++)
+            {
+                if (nums[current] == nums[i]) continue;
+
+                current++;
+                nums[current] = nums[i];
+
+            }
+            return current;
+        }
+
+        public static int HammingWeight(uint n)
+        {
+            var count = 0;
+            while (n > 0)
+            {
+                count += (int)(n & 1);
+                n >>= 1;
+            }
+            return count;
+        }
+
+        public static void DeleteNode(ListNode node)
+        {
+            while (node != null && node.next != null)
+            {
+                node.val = node.next.val;
+                if (node.next.next == null)
+                    node.next = null;
+                node = node.next;
+            }
+        }
+
+
+        public static void MoveZeroes(int[] nums)
+        {
+            var j = 0;
+            var i = 0;
+            while (i < nums.Length)
+            {
+                if (nums[j] == 0)
+                {
+                    if (nums[i] != 0)
+                    {
+                        nums[j++] = nums[i];
+                        nums[i] = 0;
+                    }
+                }
+                else
+                {
+                    j++;
+                }
+                i++;
+            }
+        }
+
+        public IList<IList<string>> SuggestedProducts(string[] products, string searchWord)
+        {
+            var prod = products.Where(p => p.StartsWith(searchWord[0])).OrderBy(x => x).ToList();
+
+            var result = new List<IList<string>>();
+            for (int i = 0; i < searchWord.Length; i++)
+            {
+                result.Add(prod.Where(w => w.StartsWith(searchWord.Substring(0, i + 1))).Take(3).ToList());
+            }
+            return result;
+        }
+
         public static string MinimizeResult(string expression)
         {
             var eq = 0;
@@ -480,7 +2132,7 @@ namespace Leetcode
                     if (val < min)
                     {
                         min = val;
-                        res = string.Concat(expression.Substring(0, i), '(', expression.Substring(i, j - i),  ')', expression.Substring(j));
+                        res = string.Concat(expression.Substring(0, i), '(', expression.Substring(i, j - i), ')', expression.Substring(j));
                     }
                 }
             }

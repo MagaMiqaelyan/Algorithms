@@ -17,7 +17,49 @@ namespace Graph
     {
         static void Main(string[] args)
         {
-            Timus2062();
+            Console.WriteLine(Metro());
+        }
+
+
+        public static double Metro()
+        {
+            var nm = Console.ReadLine().Split(' ').Select(Int32.Parse).ToArray();
+            var n = nm[0];
+            var m = nm[1];
+
+            var k = Convert.ToInt32(Console.ReadLine());
+            var matrix = new double[n + 1, m + 1];
+            var diaganal = new bool[n + 1, m + 1];
+            for (int i = 0; i < k; i++)
+            {
+                var xy = Console.ReadLine().Split(' ').Select(Int32.Parse).ToArray();
+                diaganal[xy[0], xy[1]] = true;
+            }
+
+            for (int i = 0; i <= n; i++)
+            {
+                for (int j = 0; j <= m; j++)
+                {
+                    if (i == 0 && j == 0) continue;
+
+                    if (i - 1 >= 0)
+                        if (matrix[i, j] == 0 || matrix[i, j] > matrix[i - 1, j] + 100)
+                            matrix[i, j] = matrix[i - 1, j] + 100;
+
+                    if (j - 1 >= 0)
+                        if (matrix[i, j] == 0 || matrix[i, j] > matrix[i, j - 1] + 100)
+                            matrix[i, j] = matrix[i, j - 1] + 100;
+
+
+                    if (diaganal[i, j])
+                    {
+                        if (matrix[i, j] == 0 || matrix[i, j] > matrix[i - 1, j - 1] + Math.Sqrt(2) * 100)
+                            matrix[i, j] = matrix[i - 1, j - 1] + Math.Sqrt(2) * 100;
+
+                    }
+                }
+            }
+            return Math.Round(matrix[n, m]);
         }
 
 
@@ -1148,47 +1190,31 @@ namespace Graph
 
             }
         }
-
-        public static void Metro()
-        {
-            var nm = Console.ReadLine().Split(' ').Select(Int32.Parse).ToArray();
-            var n = nm[0];
-            var m = nm[1];
-
-            var k = Convert.ToInt32(Console.ReadLine());
-            var diagonal = new Point[k];
-            for (int i = 0; i < k; i++)
-            {
-                var xy = Console.ReadLine().Split(' ').Select(Int32.Parse).ToArray();
-                diagonal[i] = new Point(xy[0], xy[1]);
-            }
-
-        }
     }
 }
 
-  //var n = int.Parse(Console.ReadLine());
-            //var tree = new Tree(n);
-            //for (int i = 0; i < n - 1; i++)
-            //{
-            //    var ab = Console.ReadLine().Split();
-            //    var a = int.Parse(ab[0]) - 1;
-            //    var b = int.Parse(ab[1]) - 1;
-            //    tree.AddEdge(a, b, 1);
-            //}
-            //tree.PreCalculate();
-            //var vert = tree._tree.Where(x => x.Value.Count == 1).ToList();
-            //var min = int.MaxValue;
-            //for (int i = 0; i < vert.Count - 1; i++)
-            //{
-            //    for (int j = i + 1; j < vert.Count; j++)
-            //    {
-            //        var l = tree.LCA(vert[i].Key, vert[j].Key);
-            //        var d = tree._depth[l];
-            //        var a = tree._depth[vert[i].Key] - d;
-            //        var b = tree._depth[vert[j].Key] - d;
-            //        min = Math.Min(a + b, min);
-            //    }
-            //}
+//var n = int.Parse(Console.ReadLine());
+//var tree = new Tree(n);
+//for (int i = 0; i < n - 1; i++)
+//{
+//    var ab = Console.ReadLine().Split();
+//    var a = int.Parse(ab[0]) - 1;
+//    var b = int.Parse(ab[1]) - 1;
+//    tree.AddEdge(a, b, 1);
+//}
+//tree.PreCalculate();
+//var vert = tree._tree.Where(x => x.Value.Count == 1).ToList();
+//var min = int.MaxValue;
+//for (int i = 0; i < vert.Count - 1; i++)
+//{
+//    for (int j = i + 1; j < vert.Count; j++)
+//    {
+//        var l = tree.LCA(vert[i].Key, vert[j].Key);
+//        var d = tree._depth[l];
+//        var a = tree._depth[vert[i].Key] - d;
+//        var b = tree._depth[vert[j].Key] - d;
+//        min = Math.Min(a + b, min);
+//    }
+//}
 
-            //Console.WriteLine(min);
+//Console.WriteLine(min);
